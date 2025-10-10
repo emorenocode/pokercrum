@@ -1,0 +1,21 @@
+<p>board-page works!</p>
+
+<div class="card-list">
+  @for (card of cards; track $index) {
+  <button
+    class="card"
+    [class.selected]="card === cardSelected"
+    (click)="cardSelected = card"
+    title="{{ card.tooltip }}"
+  >
+    {{ card.label }}
+  </button>
+  }
+</div>
+
+<div class="user-list">
+  <div class="user">
+    <button class="card">{{ cardSelected.label }}</button>
+    <span>Enrique</span>
+  </div>
+</div>
