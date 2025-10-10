@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-board-page',
@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
   styleUrl: './board-page.css',
 })
 export default class BoardPage {
-  cards = [
+  public cards = [
     { value: 0, label: '0', tooltip: '' },
     { value: 0.5, label: '1/2', tooltip: 'Tarea muy pequeña' },
     { value: 1, label: '1', tooltip: 'Tarea pequeña' },
@@ -23,5 +23,19 @@ export default class BoardPage {
     { value: '♾️', label: '♾️', tooltip: 'Tarea enorme' },
     { value: '☕️', label: '☕️', tooltip: 'Hora de una pause' },
   ];
-  cardSelected: any;
+  public participants: any[] = [
+    { user: 'Luis', card: '1' },
+    { user: 'Pedro', card: '2' },
+    { user: 'Carlos', card: '3' },
+    { user: 'María', card: '5' },
+    { user: 'María 2', card: '100' },
+    { user: 'María 3', card: '♾️' },
+    { user: 'María 4', card: '☕️' },
+  ];
+  public cardSelected: any;
+  public readonly showCards = signal(false);
+
+  onShowCards() {
+    this.showCards.set(true);
+  }
 }

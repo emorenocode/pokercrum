@@ -1,21 +1,42 @@
 <p>board-page works!</p>
 
-<div class="card-list">
-  @for (card of cards; track $index) {
-  <button
-    class="card"
-    [class.selected]="card === cardSelected"
-    (click)="cardSelected = card"
-    title="{{ card.tooltip }}"
-  >
-    {{ card.label }}
-  </button>
-  }
-</div>
-
-<div class="user-list">
-  <div class="user">
-    <button class="card">{{ cardSelected.label }}</button>
-    <span>Enrique</span>
+<section>
+  <h2>Cartas</h2>
+  <div class="card-list">
+    @for (card of cards; track $index) {
+    <button
+      class="card"
+      [class.selected]="card === cardSelected"
+      (click)="cardSelected = card"
+      title="{{ card.tooltip }}"
+    >
+      <div class="card__inner">
+        <div class="card__front">
+          {{ card.label }}
+        </div>
+        <div class="card__back">🔥</div>
+      </div>
+    </button>
+    }
   </div>
-</div>
+</section>
+
+<section class="participants">
+  <h2>Participantes</h2>
+  <button (click)="onShowCards()">Ver</button>
+  <div class="user-list">
+    @for (participant of participants; track $index) {
+    <div class="user">
+      <div class="card" [class.flipped]="showCards()">
+        <div class="card__inner">
+          <div class="card__front">
+            {{ participant.card }}
+          </div>
+          <div class="card__back">🔥</div>
+        </div>
+      </div>
+      <span>{{ participant.user }}</span>
+    </div>
+    }
+  </div>
+</section>
