@@ -1,5 +1,4 @@
 import { Component, signal } from '@angular/core';
-import { JsonPipe } from '@angular/common';
 
 interface Card {
   value: string;
@@ -23,12 +22,12 @@ export function countCards(list: User[]): Record<string, number> {
 
 @Component({
   selector: 'app-board-page',
-  imports: [JsonPipe],
+  imports: [],
   templateUrl: './board-page.html',
   styleUrl: './board-page.css',
 })
 export default class BoardPage {
-  public cards: Card[] = [
+  public cards = signal<Card[]>([
     { value: '0', label: '' },
     { value: '1/2', label: 'Tarea muy pequeña' },
     { value: '1', label: 'Tarea pequeña' },
@@ -43,8 +42,8 @@ export default class BoardPage {
     { value: '?', label: 'Tarea Inestimable' },
     { value: '♾️', label: 'Tarea enorme' },
     { value: '☕️', label: 'Hora de una pause' },
-  ];
-  public participants: User[] = [
+  ]);
+  public participants = signal<User[]>([
     {
       id: 'asdf1',
       username: 'Luis 1',
@@ -53,7 +52,7 @@ export default class BoardPage {
     },
     {
       id: 'asdf2',
-      username: 'Luis 2',
+      username: 'Luis el destructor',
       role: 'user',
       card: { value: '1', label: '1' },
     },
@@ -62,6 +61,12 @@ export default class BoardPage {
       username: 'Luis 3',
       role: 'user',
       card: { value: '1', label: '1' },
+    },
+    {
+      id: 'asdf3',
+      username: 'Luis 33',
+      role: 'user',
+      card: { value: '1/2', label: '1/2' },
     },
     {
       id: 'asdf4',
@@ -93,7 +98,7 @@ export default class BoardPage {
       role: 'user',
       card: { value: '☕️', label: '☕️' },
     },
-  ];
+  ]);
   public cardSelected: any;
   public user: User = {
     id: 'asdfasdf',
@@ -102,11 +107,11 @@ export default class BoardPage {
   };
   public readonly showCards = signal(false);
   public result!: Record<string, number>;
-  public cardResult: Card[] = [];
+  public cardResult = signal<Card[]>([]);
 
   onShowCards() {
     this.showCards.set(true);
-    const result = countCards(this.participants);
+    const result = countCards(this.participants());
     const resultList: Card[] = [];
     console.log('Result = ', result);
 
@@ -116,10 +121,12 @@ export default class BoardPage {
         label: value.toString(),
       });
     });
-    this.cardResult = resultList;
+    this.cardResult.set(resultList);
   }
 
   onSelectCard(card: Card) {
     this.cardSelected = card;
+    const user = { ...this.user, card };
+    console.log(user);
   }
 }
