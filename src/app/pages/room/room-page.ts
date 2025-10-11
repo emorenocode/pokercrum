@@ -21,12 +21,12 @@ export function countCards(list: User[]): Record<string, number> {
 }
 
 @Component({
-  selector: 'app-board-page',
+  selector: 'app-room',
   imports: [],
-  templateUrl: './board-page.html',
-  styleUrl: './board-page.css',
+  templateUrl: './room-page.html',
+  styleUrl: './room-page.css',
 })
-export default class BoardPage {
+export class RoomPage {
   public cards = signal<Card[]>([
     { value: '0', label: '' },
     { value: '1/2', label: 'Tarea muy pequeña' },
