@@ -6,11 +6,11 @@
       class="card"
       [class.selected]="card === cardSelected"
       (click)="onSelectCard(card)"
-      title="{{ card.tooltip }}"
+      title="{{ card.label }}"
     >
       <div class="card__inner">
         <div class="card__front">
-          {{ card.label }}
+          {{ card.value }}
         </div>
         <div class="card__back">🔥</div>
       </div>
@@ -41,5 +41,17 @@
 
 <section>
   <h2>Result</h2>
-  <pre>{{ result | json }}</pre>
+  <div class="result-list">
+    @for (card of cardResult; track $index) {
+    <div class="result">
+      <span class="result-label">{{ card.label }}</span>
+      <div class="card" [class.flipped]="showCards()">
+        <div class="card__inner">
+          <div class="card__front">🔥</div>
+          <div class="card__back">{{ card.value }}</div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
 </section>

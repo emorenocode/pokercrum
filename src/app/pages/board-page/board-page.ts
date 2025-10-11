@@ -2,9 +2,8 @@ import { Component, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
 
 interface Card {
-  value: number | string;
+  value: string;
   label: string;
-  tooltip: string;
 }
 
 interface User {
@@ -30,57 +29,69 @@ export function countCards(list: User[]): Record<string, number> {
 })
 export default class BoardPage {
   public cards: Card[] = [
-    { value: 0, label: '0', tooltip: '' },
-    { value: 0.5, label: '1/2', tooltip: 'Tarea muy pequeña' },
-    { value: 1, label: '1', tooltip: 'Tarea pequeña' },
-    { value: 2, label: '2', tooltip: 'Tarea pequeña' },
-    { value: 3, label: '3', tooltip: 'Tarea pequeńa' },
-    { value: 5, label: '5', tooltip: 'Tarea mediana' },
-    { value: 8, label: '8', tooltip: 'Tarea mediana' },
-    { value: 13, label: '13', tooltip: 'Tarea mediana' },
-    { value: 20, label: '20', tooltip: 'Tarea grande' },
-    { value: 40, label: '40', tooltip: 'Tarea grande' },
-    { value: 100, label: '100', tooltip: 'Tarea muy grande' },
-    { value: '?', label: '?', tooltip: 'Tarea Inestimable' },
-    { value: '♾️', label: '♾️', tooltip: 'Tarea enorme' },
-    { value: '☕️', label: '☕️', tooltip: 'Hora de una pause' },
+    { value: '0', label: '' },
+    { value: '1/2', label: 'Tarea muy pequeña' },
+    { value: '1', label: 'Tarea pequeña' },
+    { value: '2', label: 'Tarea pequeña' },
+    { value: '3', label: 'Tarea pequeńa' },
+    { value: '5', label: 'Tarea mediana' },
+    { value: '8', label: 'Tarea mediana' },
+    { value: '13', label: 'Tarea mediana' },
+    { value: '20', label: 'Tarea grande' },
+    { value: '40', label: 'Tarea grande' },
+    { value: '100', label: 'Tarea muy grande' },
+    { value: '?', label: 'Tarea Inestimable' },
+    { value: '♾️', label: 'Tarea enorme' },
+    { value: '☕️', label: 'Hora de una pause' },
   ];
   public participants: User[] = [
     {
       id: 'asdf1',
       username: 'Luis 1',
       role: 'user',
-      card: { value: '1', label: '1', tooltip: '' },
+      card: { value: '1', label: '1' },
     },
     {
       id: 'asdf2',
       username: 'Luis 2',
       role: 'user',
-      card: { value: '1', label: '1', tooltip: '' },
+      card: { value: '1', label: '1' },
     },
     {
       id: 'asdf3',
       username: 'Luis 3',
       role: 'user',
-      card: { value: '1', label: '1', tooltip: '' },
+      card: { value: '1', label: '1' },
     },
     {
       id: 'asdf4',
       username: 'Luis 4',
       role: 'user',
-      card: { value: '1', label: '1', tooltip: '' },
+      card: { value: '3', label: '1' },
     },
     {
       id: 'asdf5',
       username: 'Luis 5',
       role: 'user',
-      card: { value: '1', label: '1', tooltip: '' },
+      card: { value: '1', label: '1' },
     },
     {
       id: 'asdf6',
       username: 'Luis 6',
       role: 'user',
-      card: { value: '1', label: '1', tooltip: '' },
+      card: { value: '3', label: '1' },
+    },
+    {
+      id: 'asdf6',
+      username: 'Luis 7',
+      role: 'user',
+      card: { value: '♾️', label: '♾️' },
+    },
+    {
+      id: 'asdf6',
+      username: 'Luis 8',
+      role: 'user',
+      card: { value: '☕️', label: '☕️' },
     },
   ];
   public cardSelected: any;
@@ -91,11 +102,21 @@ export default class BoardPage {
   };
   public readonly showCards = signal(false);
   public result!: Record<string, number>;
+  public cardResult: Card[] = [];
 
   onShowCards() {
     this.showCards.set(true);
-    this.result = countCards(this.participants);
-    console.log('Result = ', this.result);
+    const result = countCards(this.participants);
+    const resultList: Card[] = [];
+    console.log('Result = ', result);
+
+    Object.entries(result).forEach(([key, value]) => {
+      resultList.push({
+        value: key,
+        label: value.toString(),
+      });
+    });
+    this.cardResult = resultList;
   }
 
   onSelectCard(card: Card) {
