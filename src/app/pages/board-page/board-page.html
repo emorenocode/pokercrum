@@ -1,13 +1,11 @@
-<p>board-page works!</p>
-
 <section>
-  <h2>Cartas</h2>
+  <h2>Cards</h2>
   <div class="card-list">
     @for (card of cards; track $index) {
     <button
       class="card"
       [class.selected]="card === cardSelected"
-      (click)="cardSelected = card"
+      (click)="onSelectCard(card)"
       title="{{ card.tooltip }}"
     >
       <div class="card__inner">
@@ -22,21 +20,26 @@
 </section>
 
 <section class="participants">
-  <h2>Participantes</h2>
-  <button (click)="onShowCards()">Ver</button>
+  <h2>Participants</h2>
+  @if (user.role === 'admin') {
+  <button (click)="onShowCards()">Reveal</button>
+  }
   <div class="user-list">
     @for (participant of participants; track $index) {
     <div class="user">
       <div class="card" [class.flipped]="showCards()">
         <div class="card__inner">
-          <div class="card__front">
-            {{ participant.card }}
-          </div>
-          <div class="card__back">🔥</div>
+          <div class="card__front">🔥</div>
+          <div class="card__back">{{ participant.card?.value }}</div>
         </div>
       </div>
-      <span>{{ participant.user }}</span>
+      <span>{{ participant.username }}</span>
     </div>
     }
   </div>
+</section>
+
+<section>
+  <h2>Result</h2>
+  <pre>{{ result | json }}</pre>
 </section>
