@@ -74,6 +74,7 @@
   }
 }
 
+.card.disabled,
 .card.selected .card__inner {
   pointer-events: none;
 }

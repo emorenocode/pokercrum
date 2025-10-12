@@ -5,6 +5,7 @@
     <button
       class="card"
       [class.selected]="card === cardSelected"
+      [class.disabled]="showCards()"
       (click)="onSelectCard(card)"
       title="{{ card.label }}"
     >
@@ -21,14 +22,16 @@
 
 <section class="participants">
   <h2>
-    Participants @if (user.role === 'admin') {
+    Participants @if (user.role === 'admin') { @if (showCards()) {
+    <button (click)="onResetCards()">Reset</button>
+    } @else {
     <button (click)="onShowCards()">Reveal</button>
-    }
+    } }
   </h2>
   <div class="user-list">
     @for (participant of participants(); track $index) {
     <div class="user">
-      <div class="card" [class.flipped]="showCards()">
+      <div class="card disabled" [class.flipped]="showCards()">
         <div class="card__inner">
           <div class="card__front">🔥</div>
           <div class="card__back">{{ participant.card?.value }}</div>
@@ -43,16 +46,16 @@
 <section>
   <h2>Result</h2>
   <div class="result-list">
-    @for (card of cardResult(); track $index) {
+    @if (showCards()) { @for (card of cardResult(); track $index) {
     <div class="result">
       <span class="result-label">{{ card.label }}</span>
-      <div class="card" [class.flipped]="showCards()">
+      <div class="card disabled flipped">
         <div class="card__inner">
           <div class="card__front">🔥</div>
           <div class="card__back">{{ card.value }}</div>
         </div>
       </div>
     </div>
-    }
+    } }
   </div>
 </section>

@@ -129,4 +129,8 @@ export class RoomPage {
     const user = { ...this.user, card };
     console.log(user);
   }
+
+  onResetCards() {
+    this.showCards.set(false);
+  }
 }
