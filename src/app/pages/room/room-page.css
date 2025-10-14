@@ -103,3 +103,8 @@ section {
   gap: 50px;
   margin-bottom: 50px;
 }
+
+.join-room {
+  display: flex;
+  justify-content: center;
+}

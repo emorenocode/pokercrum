@@ -1,9 +1,13 @@
-<div>
-  <input type="text" placeholder="Enter room code" />
-  <button>Join Room</button>
-</div>
-<p>----- or -----</p>
-<div>
-  <input type="text" placeholder="Enter Username" />
-  <button (click)="onCreateRoom()">Create Room</button>
-</div>
+<main>
+  <h1>PokerCrum</h1>
+  <p>Create a new room and start estimating with your team</p>
+  <div>
+    <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
+    <button (click)="onCreateRoom()">Create Room</button>
+    @if (username.touched && username.invalid) {
+    <div>
+      <span>username is required</span>
+    </div>
+    }
+  </div>
+</main>

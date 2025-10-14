@@ -1,11 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { RoomService } from './room-service';
+import { JsonPipe } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 interface Card {
   value: string;
   label: string;
 }
 
-interface User {
+export interface User {
   id: string;
   username: string;
   role: 'admin' | 'user';
@@ -22,11 +25,13 @@ export function countCards(list: User[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [],
+  imports: [JsonPipe, ReactiveFormsModule],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
-export class RoomPage {
+export class RoomPage implements OnInit {
+  username = new FormControl();
+  private readonly roomService = inject(RoomService);
   public cards = signal<Card[]>([
     { value: '0', label: '' },
     { value: '1/2', label: 'Tarea muy pequeña' },
@@ -43,71 +48,98 @@ export class RoomPage {
     { value: '♾️', label: 'Tarea enorme' },
     { value: '☕️', label: 'Hora de una pause' },
   ]);
-  public participants = signal<User[]>([
-    {
-      id: 'asdf1',
-      username: 'Luis 1',
-      role: 'user',
-      card: { value: '1', label: '1' },
-    },
-    {
-      id: 'asdf2',
-      username: 'Luis el destructor',
-      role: 'user',
-      card: { value: '1', label: '1' },
-    },
-    {
-      id: 'asdf3',
-      username: 'Luis 3',
-      role: 'user',
-      card: { value: '1', label: '1' },
-    },
-    {
-      id: 'asdf3',
-      username: 'Luis 33',
-      role: 'user',
-      card: { value: '1/2', label: '1/2' },
-    },
-    {
-      id: 'asdf4',
-      username: 'Luis 4',
-      role: 'user',
-      card: { value: '3', label: '1' },
-    },
-    {
-      id: 'asdf5',
-      username: 'Luis 5',
-      role: 'user',
-      card: { value: '1', label: '1' },
-    },
-    {
-      id: 'asdf6',
-      username: 'Luis 6',
-      role: 'user',
-      card: { value: '3', label: '1' },
-    },
-    {
-      id: 'asdf6',
-      username: 'Luis 7',
-      role: 'user',
-      card: { value: '♾️', label: '♾️' },
-    },
-    {
-      id: 'asdf6',
-      username: 'Luis 8',
-      role: 'user',
-      card: { value: '☕️', label: '☕️' },
-    },
-  ]);
+  public participants = signal<User[]>([]);
   public cardSelected: any;
-  public user: User = {
-    id: 'asdfasdf',
-    username: 'Enrique',
-    role: 'admin',
-  };
+  public user = this.roomService.currentUser;
   public readonly showCards = signal(false);
   public result!: Record<string, number>;
   public cardResult = signal<Card[]>([]);
+  roomCode = input();
+
+  ngOnInit(): void {
+    this.checkUser();
+  }
+
+  checkUser() {
+    const roomStored = localStorage.getItem('pokercrum');
+    if (roomStored) {
+      const state = JSON.parse(roomStored);
+      if (state.room === this.roomCode()) {
+        this.user = signal(state.user);
+      }
+    }
+  }
+
+  onJoinRoom() {
+    const username = this.username.value ?? '';
+    if (this.username.invalid || username.trim() === '') {
+      this.username.reset();
+      this.username.markAllAsTouched();
+      return;
+    }
+
+    console.log('RoomCode ', this.roomCode());
+
+    setTimeout(() => {
+      this.participants.set([
+        {
+          id: 'asdf1',
+          username: 'Luis 1',
+          role: 'user',
+          card: { value: '1', label: '1' },
+        },
+        {
+          id: '1234',
+          username: 'Luis el destructor',
+          role: 'user',
+        },
+        {
+          id: 'asdf3',
+          username: 'Luis 3',
+          role: 'user',
+          card: { value: '1', label: '1' },
+        },
+        {
+          id: 'asdf3',
+          username: 'Luis 33',
+          role: 'user',
+          card: { value: '1/2', label: '1/2' },
+        },
+        {
+          id: 'asdf4',
+          username: 'Luis 4',
+          role: 'user',
+          card: { value: '3', label: '1' },
+        },
+        {
+          id: 'asdf5',
+          username: 'Luis 5',
+          role: 'user',
+          card: { value: '1', label: '1' },
+        },
+        {
+          id: 'asdf6',
+          username: 'Luis 6',
+          role: 'user',
+          card: { value: '3', label: '1' },
+        },
+        {
+          id: 'asdf6',
+          username: 'Luis 7',
+          role: 'user',
+          card: { value: '♾️', label: '♾️' },
+        },
+        {
+          id: 'asdf6',
+          username: 'Luis 8',
+          role: 'user',
+          card: { value: '☕️', label: '☕️' },
+        },
+      ]);
+    }, 3000);
+
+    // this.roomService.joinRoom;
+  }
 
   onShowCards() {
     this.showCards.set(true);

@@ -1,0 +1,25 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.join-room {
+  display: flex;
+  justify-content: center;
+}
+
+input,
+button {
+  font-size: 24px;
+  padding: 5px;
+}
+
+p {
+  padding: 25px 5px;
+}
+
+span {
+  color: rgb(254, 79, 79);
+}

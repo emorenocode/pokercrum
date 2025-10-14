@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: ':id',
+    path: ':roomCode',
     loadComponent: () => import('./pages/room/room-page').then((c) => c.RoomPage),
   },
   {
