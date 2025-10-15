@@ -1,73 +1,88 @@
-@let currentPlayer = player(); @if (currentPlayer.username != '') {
-<section class="card-list-container">
-  <h2>Cards</h2>
-  <div class="card-list">
-    @for (card of cards(); track $index) {
-    <button
-      class="card flipped"
-      [class.selected]="card === cardSelected"
-      [class.disabled]="showCards()"
-      (click)="onSelectCard(card)"
-      title="{{ card.label }}"
-    >
-      <div class="card__inner">
-        <div class="card__front">🔥</div>
-        <div class="card__back">
-          {{ card.value }}
-        </div>
-      </div>
-    </button>
-    }
-  </div>
-</section>
+@let currentPlayer = player();
 
-<section class="participants">
-  <h2>Players</h2>
-  <div class="user-list">
-    @for (player of players(); track $index) {
-    <div class="user">
-      <div class="card disabled" [class.flipped]="showCards()">
-        <div class="card__inner">
-          <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
-          <div class="card__back">{{ player.card?.value }}</div>
-        </div>
-        @if (currentPlayer.role === 'admin') {
-        <button (click)="onDeletePlayer(player.id)">x</button>
-        }
-      </div>
-      <span>{{ player.username }}</span>
+<header class="navbar">
+  <div class="logo">
+    <a [routerLink]="['/']">ProkerCrum</a>
+  </div>
+  <nav>
+    <div class="player" title="{{ currentPlayer.username }}">
+      {{ currentPlayer.username.toUpperCase().slice(0, 2) }}
     </div>
-    }
-  </div>
-</section>
+  </nav>
+</header>
 
-<section>
-  <h2>Result</h2>
-  <div class="result-list">
-    @if (showCards()) { @for (card of cardResult(); track $index) {
-    <div class="result">
-      <span class="result-label">{{ card.label }}</span>
-      <div class="card disabled flipped">
+<main>
+  @if (currentPlayer.username != '') {
+  <section class="card-list-container">
+    <h2>Cards</h2>
+    <div class="card-list">
+      @for (card of cards(); track $index) {
+      <button
+        class="card flipped"
+        [class.selected]="card === cardSelected"
+        [class.disabled]="showCards()"
+        (click)="onSelectCard(card)"
+        title="{{ card.label }}"
+      >
         <div class="card__inner">
           <div class="card__front">🔥</div>
-          <div class="card__back">{{ card.value }}</div>
+          <div class="card__back">
+            {{ card.value }}
+          </div>
+        </div>
+      </button>
+      }
+    </div>
+  </section>
+
+  <section class="participants">
+    <h2>Players</h2>
+    <div class="user-list">
+      @for (player of players(); track $index) {
+      <div class="user">
+        <div class="card disabled" [class.flipped]="showCards()">
+          <div class="card__inner">
+            <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
+            <div class="card__back">{{ player.card?.value }}</div>
+          </div>
+          @if (currentPlayer.role === 'admin') {
+          <button (click)="onDeletePlayer(player.id)">x</button>
+          }
+        </div>
+        <span>{{ player.username }}</span>
+      </div>
+      }
+    </div>
+  </section>
+
+  <section>
+    <h2>Result</h2>
+    <div class="result-list">
+      @if (showCards()) { @for (card of cardResult(); track $index) {
+      <div class="result">
+        <span class="result-label">{{ card.label }}</span>
+        <div class="card disabled flipped">
+          <div class="card__inner">
+            <div class="card__front">🔥</div>
+            <div class="card__back">{{ card.value }}</div>
+          </div>
         </div>
       </div>
+      } }
     </div>
+    @if (currentPlayer.role === 'admin') { @if (showCards()) {
+    <button class="btn" (click)="onResetCards()">Reset</button>
+    } @else {
+    <button class="btn" (click)="onShowCards()">Reveal</button>
     } }
-  </div>
-  @if (currentPlayer.role === 'admin') { @if (showCards()) {
-  <button class="btn" (click)="onResetCards()">Reset</button>
+  </section>
   } @else {
-  <button class="btn" (click)="onShowCards()">Reveal</button>
-  } }
-</section>
-} @else {
-<div class="join-room">
-  <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
-  <button (click)="onJoinRoom()">Join Room</button>
-  @if (username.touched && username.invalid) {
-  <div>username is required</div>
+  <div class="join-room">
+    <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
+    <button (click)="onJoinRoom()">Join Room</button>
+    @if (username.touched && username.invalid) {
+    <div>username is required</div>
+    }
+  </div>
   }
-</div>
-}
+</main>

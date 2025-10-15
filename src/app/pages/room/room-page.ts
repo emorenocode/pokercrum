@@ -1,6 +1,7 @@
 import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 export interface Card {
   value: string;
@@ -26,7 +27,7 @@ export function countCards(list: Player[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })

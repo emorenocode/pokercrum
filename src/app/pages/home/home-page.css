@@ -1,8 +1,17 @@
+:host {
+  display: grid;
+  place-content: center;
+  height: 100dvh;
+}
+
 main {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin: 0 auto;
+  max-width: 900px;
+  padding-top: 50px;
 }
 
 .join-room {
