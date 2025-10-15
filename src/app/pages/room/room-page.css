@@ -88,6 +88,8 @@ main {
     outline: 1px solid #000;
     line-height: 16px;
     pointer-events: all;
+    font-size: 0.9rem;
+    padding: 0;
   }
 }
 
