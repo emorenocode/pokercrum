@@ -1,6 +1,5 @@
 import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { RoomService } from './room-service';
-import { JsonPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 export interface Card {
@@ -8,15 +7,17 @@ export interface Card {
   label: string;
 }
 
-export interface User {
+export interface Player {
   id: string;
   username: string;
   role: 'admin' | 'user';
   card?: Card;
 }
 
-export function countCards(list: User[]): Record<string, number> {
+export function countCards(list: Player[]): Record<string, number> {
   return list.reduce((acc, item) => {
+    if (item.card?.value == null) return acc;
+
     const key = String(item.card?.value);
     acc[key] = (acc[key] ?? 0) + 1;
     return acc;
@@ -25,7 +26,7 @@ export function countCards(list: User[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [JsonPipe, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
@@ -48,9 +49,9 @@ export class RoomPage implements OnInit {
     { value: '♾️', label: 'Tarea enorme' },
     { value: '☕️', label: 'Hora de una pause' },
   ]);
-  public participants = signal<User[]>([]);
+  public participants = signal<Player[]>([]);
   public cardSelected: any;
-  public user = this.roomService.currentUser;
+  public player = this.roomService.currentPlayer;
   public readonly showCards = signal(false);
   public result!: Record<string, number>;
   public cardResult = signal<Card[]>([]);
@@ -59,13 +60,13 @@ export class RoomPage implements OnInit {
   ngOnInit(): void {
     this.checkUser();
     this.getPlayers();
+    this.onListenerReveal();
   }
 
   getPlayers() {
     this.roomService.getParticipants(this.roomCode()).subscribe({
       next: (qs) => {
-        console.log('QS ', qs);
-        this.participants.set(qs as unknown as User[]);
+        this.participants.set(qs as unknown as Player[]);
       },
     });
   }
@@ -74,8 +75,8 @@ export class RoomPage implements OnInit {
     const roomStored = localStorage.getItem('pokercrum');
     if (roomStored) {
       const state = JSON.parse(roomStored);
-      if (state.room === this.roomCode()) {
-        this.user = signal(state.user);
+      if (state.room === this.roomCode() && state.player) {
+        this.player.set(state.player);
       }
     }
   }
@@ -88,21 +89,19 @@ export class RoomPage implements OnInit {
       return;
     }
 
-    const user = { ...this.user(), username } as User;
+    const user = { ...this.player(), username } as Player;
 
     this.roomService.joinRoom(user, this.roomCode()).subscribe({
       next: (res) => {
         console.log('UserCreated ', res);
-        this.user.set(user);
+        this.player.set(user);
       },
     });
   }
 
   onShowCards() {
-    this.showCards.set(true);
     const result = countCards(this.participants());
     const resultList: Card[] = [];
-    console.log('Result = ', result);
 
     Object.entries(result).forEach(([key, value]) => {
       resultList.push({
@@ -111,20 +110,41 @@ export class RoomPage implements OnInit {
       });
     });
     this.cardResult.set(resultList);
-  }
-
-  onSelectCard(card: Card) {
-    this.cardSelected = card;
-    const user = { ...this.user(), card } as User;
-    console.log(user);
-    this.roomService.selectCard(this.roomCode(), user).subscribe({
-      next: (res) => {
-        console.log('UserCardUpdated ', res);
+    this.roomService.onReveal(this.roomCode(), true).subscribe({
+      next: () => {
+        this.showCards.set(true);
       },
     });
   }
 
+  onSelectCard(card: Card) {
+    this.cardSelected = card;
+    const user = { ...this.player(), card } as Player;
+    this.roomService.selectCard(this.roomCode(), user).subscribe();
+  }
+
   onResetCards() {
-    this.showCards.set(false);
+    this.roomService.onResetCards(this.roomCode(), this.participants()).subscribe({
+      next: () => {
+        this.showCards.set(false);
+      },
+    });
+  }
+
+  onListenerReveal() {
+    this.roomService.getReveal(this.roomCode()).subscribe({
+      next: (res) => {
+        if (res) {
+          this.onShowCards();
+        } else {
+          this.cardSelected = undefined;
+        }
+        this.showCards.set(res);
+      },
+    });
+  }
+
+  onDeletePlayer(playerId: string) {
+    this.roomService.onDeletePlayer(this.roomCode(), playerId).subscribe();
   }
 }

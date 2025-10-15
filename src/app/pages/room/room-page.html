@@ -1,22 +1,22 @@
 <!-- <pre>{{ user() | json }}</pre> -->
 
-@if (user().username != '') {
-<section>
+@if (player().username != '') {
+<section class="card-list-container">
   <h2>Cards</h2>
   <div class="card-list">
     @for (card of cards(); track $index) {
     <button
-      class="card"
+      class="card flipped"
       [class.selected]="card === cardSelected"
       [class.disabled]="showCards()"
       (click)="onSelectCard(card)"
       title="{{ card.label }}"
     >
       <div class="card__inner">
-        <div class="card__front">
+        <div class="card__front">🔥</div>
+        <div class="card__back">
           {{ card.value }}
         </div>
-        <div class="card__back">🔥</div>
       </div>
     </button>
     }
@@ -24,13 +24,7 @@
 </section>
 
 <section class="participants">
-  <h2>
-    Participants @if (user()?.role === 'admin') { @if (showCards()) {
-    <button (click)="onResetCards()">Reset</button>
-    } @else {
-    <button (click)="onShowCards()">Reveal</button>
-    } }
-  </h2>
+  <h2>Participants</h2>
   <div class="user-list">
     @for (participant of participants(); track $index) {
     <div class="user">
@@ -39,6 +33,9 @@
           <div class="card__front">{{ participant.card?.value ? '🔥' : '' }}</div>
           <div class="card__back">{{ participant.card?.value }}</div>
         </div>
+        @if (player().role === 'admin') {
+        <button (click)="onDeletePlayer(participant.id)">x</button>
+        }
       </div>
       <span>{{ participant.username }}</span>
     </div>
@@ -61,6 +58,11 @@
     </div>
     } }
   </div>
+  @if (player().role === 'admin') { @if (showCards()) {
+  <button class="btn" (click)="onResetCards()">Reset</button>
+  } @else {
+  <button class="btn" (click)="onShowCards()">Reveal</button>
+  } }
 </section>
 } @else {
 <div class="join-room">
