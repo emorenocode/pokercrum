@@ -1,6 +1,4 @@
-<!-- <pre>{{ user() | json }}</pre> -->
-
-@if (player().username != '') {
+@let currentPlayer = player(); @if (currentPlayer.username != '') {
 <section class="card-list-container">
   <h2>Cards</h2>
   <div class="card-list">
@@ -24,20 +22,20 @@
 </section>
 
 <section class="participants">
-  <h2>Participants</h2>
+  <h2>Players</h2>
   <div class="user-list">
-    @for (participant of participants(); track $index) {
+    @for (player of players(); track $index) {
     <div class="user">
       <div class="card disabled" [class.flipped]="showCards()">
         <div class="card__inner">
-          <div class="card__front">{{ participant.card?.value ? '🔥' : '' }}</div>
-          <div class="card__back">{{ participant.card?.value }}</div>
+          <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
+          <div class="card__back">{{ player.card?.value }}</div>
         </div>
-        @if (player().role === 'admin') {
-        <button (click)="onDeletePlayer(participant.id)">x</button>
+        @if (currentPlayer.role === 'admin') {
+        <button (click)="onDeletePlayer(player.id)">x</button>
         }
       </div>
-      <span>{{ participant.username }}</span>
+      <span>{{ player.username }}</span>
     </div>
     }
   </div>
@@ -58,7 +56,7 @@
     </div>
     } }
   </div>
-  @if (player().role === 'admin') { @if (showCards()) {
+  @if (currentPlayer.role === 'admin') { @if (showCards()) {
   <button class="btn" (click)="onResetCards()">Reset</button>
   } @else {
   <button class="btn" (click)="onShowCards()">Reveal</button>

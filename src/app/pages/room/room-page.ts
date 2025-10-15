@@ -49,7 +49,7 @@ export class RoomPage implements OnInit {
     { value: '♾️', label: 'Tarea enorme' },
     { value: '☕️', label: 'Hora de una pause' },
   ]);
-  public participants = signal<Player[]>([]);
+  public players = signal<Player[]>([]);
   public cardSelected: any;
   public player = this.roomService.currentPlayer;
   public readonly showCards = signal(false);
@@ -66,7 +66,7 @@ export class RoomPage implements OnInit {
   getPlayers() {
     this.roomService.getParticipants(this.roomCode()).subscribe({
       next: (qs) => {
-        this.participants.set(qs as unknown as Player[]);
+        this.players.set(qs as unknown as Player[]);
       },
     });
   }
@@ -100,7 +100,7 @@ export class RoomPage implements OnInit {
   }
 
   onShowCards() {
-    const result = countCards(this.participants());
+    const result = countCards(this.players());
     const resultList: Card[] = [];
 
     Object.entries(result).forEach(([key, value]) => {
@@ -124,7 +124,7 @@ export class RoomPage implements OnInit {
   }
 
   onResetCards() {
-    this.roomService.onResetCards(this.roomCode(), this.participants()).subscribe({
+    this.roomService.onResetCards(this.roomCode(), this.players()).subscribe({
       next: () => {
         this.showCards.set(false);
       },
