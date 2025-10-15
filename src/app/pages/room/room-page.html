@@ -21,7 +21,7 @@
       @for (card of cards(); track $index) {
       <button
         class="card flipped"
-        [class.selected]="card === cardSelected"
+        [class.selected]="card.value === cardSelected()?.value"
         [class.disabled]="showCards()"
         (click)="onSelectCard(card)"
         title="{{ card.label }}"

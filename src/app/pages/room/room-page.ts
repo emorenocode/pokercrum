@@ -51,12 +51,13 @@ export class RoomPage implements OnInit {
     { value: '☕️', label: 'Hora de una pause' },
   ]);
   public players = signal<Player[]>([]);
-  public cardSelected: any;
+  public cardSelected = signal<Card | undefined>(undefined);
   public player = this.roomService.currentPlayer;
   public readonly showCards = signal(false);
   public result!: Record<string, number>;
   public cardResult = signal<Card[]>([]);
   roomCode = input.required<string>();
+  private readonly isInitialLoad = signal(true);
 
   ngOnInit(): void {
     this.checkUser();
@@ -68,6 +69,11 @@ export class RoomPage implements OnInit {
     this.roomService.getParticipants(this.roomCode()).subscribe({
       next: (qs) => {
         this.players.set(qs as unknown as Player[]);
+        this.players().forEach((player) => {
+          if (player.id === this.player().id) {
+            this.cardSelected.set(player.card);
+          }
+        });
       },
     });
   }
@@ -119,9 +125,10 @@ export class RoomPage implements OnInit {
   }
 
   onSelectCard(card: Card) {
-    this.cardSelected = card;
+    this.cardSelected.set(card);
     const user = { ...this.player(), card } as Player;
     this.roomService.selectCard(this.roomCode(), user).subscribe();
+    this.isInitialLoad.set(false);
   }
 
   onResetCards() {
@@ -138,7 +145,9 @@ export class RoomPage implements OnInit {
         if (res) {
           this.onShowCards();
         } else {
-          this.cardSelected = undefined;
+          if (!this.isInitialLoad()) {
+            this.cardSelected.set(undefined);
+          }
         }
         this.showCards.set(res);
       },
