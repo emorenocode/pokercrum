@@ -2,12 +2,14 @@
 
 <header class="navbar">
   <div class="logo">
-    <a [routerLink]="['/']">ProkerCrum</a>
+    <a [routerLink]="['/']">PokerCrum</a>
   </div>
   <nav>
+    @if (currentPlayer.username != '') {
     <div class="player" title="{{ currentPlayer.username }}">
       {{ currentPlayer.username.toUpperCase().slice(0, 2) }}
     </div>
+    }
   </nav>
 </header>
 

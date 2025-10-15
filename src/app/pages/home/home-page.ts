@@ -12,7 +12,6 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 export class HomePage {
   private readonly roomService = inject(RoomService);
   private readonly router = inject(Router);
-  public readonly roomCode = new FormControl<string | null>(null, Validators.required);
   public readonly username = new FormControl<string | null>(null, Validators.required);
   public readonly isCreatingRoom = signal(false);
 
@@ -30,13 +29,8 @@ export class HomePage {
 
     this.roomService.createRoom(username).subscribe({
       next: (room: any) => {
-        console.log('Room ', room);
         this.router.navigate(['/', room]);
       },
     });
-  }
-
-  onJoinRoom() {
-    throw new Error('Method not implemented.');
   }
 }

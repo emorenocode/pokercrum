@@ -173,3 +173,9 @@ section {
 .btn {
   padding: 10px;
 }
+
+input,
+button {
+  font-size: 24px;
+  padding: 5px;
+}
