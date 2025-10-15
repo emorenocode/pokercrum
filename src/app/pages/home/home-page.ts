@@ -29,7 +29,8 @@ export class HomePage {
     }
 
     this.roomService.createRoom(username).subscribe({
-      next: (room) => {
+      next: (room: any) => {
+        console.log('Room ', room);
         this.router.navigate(['/', room]);
       },
     });

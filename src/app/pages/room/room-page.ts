@@ -3,7 +3,7 @@ import { RoomService } from './room-service';
 import { JsonPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
-interface Card {
+export interface Card {
   value: string;
   label: string;
 }
@@ -54,10 +54,20 @@ export class RoomPage implements OnInit {
   public readonly showCards = signal(false);
   public result!: Record<string, number>;
   public cardResult = signal<Card[]>([]);
-  roomCode = input();
+  roomCode = input.required<string>();
 
   ngOnInit(): void {
     this.checkUser();
+    this.getPlayers();
+  }
+
+  getPlayers() {
+    this.roomService.getParticipants(this.roomCode()).subscribe({
+      next: (qs) => {
+        console.log('QS ', qs);
+        this.participants.set(qs as unknown as User[]);
+      },
+    });
   }
 
   checkUser() {
@@ -78,67 +88,14 @@ export class RoomPage implements OnInit {
       return;
     }
 
-    console.log('RoomCode ', this.roomCode());
+    const user = { ...this.user(), username } as User;
 
-    setTimeout(() => {
-      this.participants.set([
-        {
-          id: 'asdf1',
-          username: 'Luis 1',
-          role: 'user',
-          card: { value: '1', label: '1' },
-        },
-        {
-          id: '1234',
-          username: 'Luis el destructor',
-          role: 'user',
-        },
-        {
-          id: 'asdf3',
-          username: 'Luis 3',
-          role: 'user',
-          card: { value: '1', label: '1' },
-        },
-        {
-          id: 'asdf3',
-          username: 'Luis 33',
-          role: 'user',
-          card: { value: '1/2', label: '1/2' },
-        },
-        {
-          id: 'asdf4',
-          username: 'Luis 4',
-          role: 'user',
-          card: { value: '3', label: '1' },
-        },
-        {
-          id: 'asdf5',
-          username: 'Luis 5',
-          role: 'user',
-          card: { value: '1', label: '1' },
-        },
-        {
-          id: 'asdf6',
-          username: 'Luis 6',
-          role: 'user',
-          card: { value: '3', label: '1' },
-        },
-        {
-          id: 'asdf6',
-          username: 'Luis 7',
-          role: 'user',
-          card: { value: '♾️', label: '♾️' },
-        },
-        {
-          id: 'asdf6',
-          username: 'Luis 8',
-          role: 'user',
-          card: { value: '☕️', label: '☕️' },
-        },
-      ]);
-    }, 3000);
-
-    // this.roomService.joinRoom;
+    this.roomService.joinRoom(user, this.roomCode()).subscribe({
+      next: (res) => {
+        console.log('UserCreated ', res);
+        this.user.set(user);
+      },
+    });
   }
 
   onShowCards() {
@@ -158,8 +115,13 @@ export class RoomPage implements OnInit {
 
   onSelectCard(card: Card) {
     this.cardSelected = card;
-    const user = { ...this.user, card };
+    const user = { ...this.user(), card } as User;
     console.log(user);
+    this.roomService.selectCard(this.roomCode(), user).subscribe({
+      next: (res) => {
+        console.log('UserCardUpdated ', res);
+      },
+    });
   }
 
   onResetCards() {

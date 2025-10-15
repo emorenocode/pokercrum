@@ -1,6 +1,6 @@
 <!-- <pre>{{ user() | json }}</pre> -->
 
-@if (user()) {
+@if (user().username != '') {
 <section>
   <h2>Cards</h2>
   <div class="card-list">
