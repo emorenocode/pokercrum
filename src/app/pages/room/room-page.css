@@ -13,6 +13,12 @@
     }
   }
 
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   .player {
     outline: 1px solid;
     border-radius: 50%;
@@ -181,6 +187,20 @@ input,
 button {
   font-size: 24px;
   padding: 5px;
+}
+
+.dialog-to-shared {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+
+  .link {
+    padding: 10px;
+    font-size: 14px;
+    outline: 1px solid;
+  }
 }
 
 @media (max-width: 425px) {

@@ -1,7 +1,11 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal, TemplateRef } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 export interface Card {
   value: string;
@@ -27,14 +31,17 @@ export function countCards(list: Player[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MatIconModule, MatButtonModule, MatDialogModule],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
 export class RoomPage implements OnInit {
-  username = new FormControl();
+  private readonly clipboad = inject(Clipboard);
   private readonly roomService = inject(RoomService);
-  public cards = signal<Card[]>([
+  private readonly isInitialLoad = signal(true);
+
+  public readonly showCards = signal(false);
+  public readonly cards = signal<Card[]>([
     { value: '0', label: '' },
     { value: '1/2', label: 'Tarea muy pequeña' },
     { value: '1', label: 'Tarea pequeña' },
@@ -50,19 +57,37 @@ export class RoomPage implements OnInit {
     { value: '♾️', label: 'Tarea enorme' },
     { value: '☕️', label: 'Hora de una pause' },
   ]);
-  public players = signal<Player[]>([]);
-  public cardSelected = signal<Card | undefined>(undefined);
-  public player = this.roomService.currentPlayer;
-  public readonly showCards = signal(false);
+  public readonly players = signal<Player[]>([]);
+  public readonly cardSelected = signal<Card | undefined>(undefined);
+  public readonly cardResult = signal<Card[]>([]);
+  public readonly dialog = inject(MatDialog);
+  public readonly currentUrl = location.href;
+  public readonly player = this.roomService.currentPlayer;
+  public readonly roomCode = input.required<string>();
+  public readonly username = new FormControl();
   public result!: Record<string, number>;
-  public cardResult = signal<Card[]>([]);
-  roomCode = input.required<string>();
-  private readonly isInitialLoad = signal(true);
 
   ngOnInit(): void {
     this.checkUser();
     this.getPlayers();
     this.onListenerReveal();
+  }
+
+  openDialogToShared(template: TemplateRef<any>) {
+    this.dialog
+      .open(template)
+      .afterClosed()
+      .subscribe({
+        next: (res) => {
+          if (!res) return;
+
+          try {
+            const success = this.clipboad.copy(this.currentUrl);
+          } catch (error) {
+            console.error('Error to copy link ', error);
+          }
+        },
+      });
   }
 
   getPlayers() {

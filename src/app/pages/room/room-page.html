@@ -6,12 +6,24 @@
   </div>
   <nav>
     @if (currentPlayer.username != '') {
+    <button mat-icon-button (click)="openDialogToShared(dialogToShared)">
+      <mat-icon>share</mat-icon>
+    </button>
     <div class="player" title="{{ currentPlayer.username }}">
       {{ currentPlayer.username.toUpperCase().slice(0, 2) }}
     </div>
     }
   </nav>
 </header>
+
+<ng-template #dialogToShared>
+  <div class="dialog-to-shared">
+    <div class="link">
+      {{ currentUrl }}
+    </div>
+    <button matButton [mat-dialog-close]="true">Copy Link</button>
+  </div>
+</ng-template>
 
 <main>
   @if (currentPlayer.username != '') {
