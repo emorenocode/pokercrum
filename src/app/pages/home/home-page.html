@@ -1,8 +1,26 @@
-<main>
+<header>
   <h1>PokerCrum</h1>
   <p>Create a new room and start estimating with your team</p>
+</header>
+
+<div class="steps">
+  <div class="step">
+    <span>1</span>
+    <p>Enter an username and create a new room</p>
+  </div>
+  <div class="step">
+    <span>2</span>
+    <p>Share the room with your team</p>
+  </div>
+  <div class="step">
+    <span>3</span>
+    <p>When everyone has selected their card, reveal the result</p>
+  </div>
+</div>
+
+<main>
   <div class="input-btn">
-    <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
+    <input type="text" name="username" placeholder="Enter username" [formControl]="username" />
     <button (click)="onCreateRoom()">Create Room</button>
   </div>
   <div style="height: 19px">

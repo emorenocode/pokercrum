@@ -4,6 +4,14 @@
   height: 100dvh;
 }
 
+header {
+  margin-block-end: 5rem;
+}
+
+h1 {
+  text-align: center;
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -37,6 +45,38 @@ p {
 
 span {
   color: rgb(254, 79, 79);
+}
+
+.steps {
+  display: flex;
+  align-items: start;
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+
+    span {
+      outline: 1px solid;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #b63600;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 0 5px 3px #ff7777;
+    }
+
+    p {
+      color: rgba(0, 0, 0, 0.5);
+      font-size: 20px;
+    }
+  }
 }
 
 @media (max-width: 425px) {
