@@ -14,7 +14,7 @@ export class App {
   constructor() {
     this.meta.updateTag({
       name: 'decription',
-      content: 'PokerCrum is a Planning Poker Game for teams using scrum methodoly',
+      content: 'PokerCrum is a Planning Poker Game for teams using scrum methodology',
     });
   }
 }
