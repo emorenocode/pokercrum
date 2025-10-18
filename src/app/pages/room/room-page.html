@@ -85,9 +85,9 @@
       } }
     </div>
     @if (currentPlayer.role === 'admin') { @if (showCards()) {
-    <button class="btn" (click)="onResetCards()">Reset</button>
+    <button matButton="outlined" (click)="onResetCards()">Reset</button>
     } @else {
-    <button class="btn" (click)="onShowCards()">Reveal</button>
+    <button matButton="outlined" (click)="onShowCards()">Reveal</button>
     } }
   </section>
   } @else {

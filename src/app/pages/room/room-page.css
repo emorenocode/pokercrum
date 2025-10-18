@@ -177,16 +177,16 @@ section {
   display: flex;
   justify-content: center;
   padding: 5px;
+
+  input,
+  button {
+    font-size: 24px;
+    padding: 5px;
+  }
 }
 
 .btn {
   padding: 10px;
-}
-
-input,
-button {
-  font-size: 24px;
-  padding: 5px;
 }
 
 .dialog-to-shared {
@@ -200,6 +200,7 @@ button {
     padding: 10px;
     font-size: 14px;
     outline: 1px solid;
+    border-radius: 10px;
   }
 }
 
