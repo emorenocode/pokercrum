@@ -4,12 +4,13 @@ import * as dotenv from 'dotenv';
 const env = process.env['ENVIRONMENT'] || 'dev';
 const envFile = `.env.${env}`;
 
-if (!existsSync(envFile)) {
-  console.error(`❌ Archivo ${envFile} no encontrado`);
-  process.exit(1);
+// ✅ Si el archivo existe (modo local), cargarlo
+if (existsSync(envFile)) {
+  dotenv.config({ path: envFile });
+  console.log(`📦 Variables cargadas desde ${envFile}`);
+} else {
+  console.log(`⚠️ Archivo ${envFile} no encontrado, usando variables de entorno (como en Vercel).`);
 }
-
-dotenv.config({ path: envFile });
 
 // 🔹 Asegurar que la carpeta exista
 const envDir = './src/environments';
