@@ -6,28 +6,27 @@ import {
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { initializeApp, provideFirebaseApp, getApp } from '@angular/fire/app';
 import { getAnalytics, provideAnalytics, ScreenTrackingService } from '@angular/fire/analytics';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
-    provideFirebaseApp(() =>
-      initializeApp({
-        projectId: 'pokercrum',
-        appId: '1:634538708239:web:acf381aa82bfc60090427a',
-        storageBucket: 'pokercrum.firebasestorage.app',
-        apiKey: 'AIzaSyDhvHEu3OrbGZzdnu7htWYWJN6tgg8hJck',
-        authDomain: 'pokercrum.firebaseapp.com',
-        messagingSenderId: '634538708239',
-        measurementId: 'G-NNCK2T8N4G',
-      })
-    ),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
     provideFirestore(() => getFirestore()),
+    provideAppCheck(() => {
+      const app = getApp();
+      return initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(environment.reCaptchaV3SiteKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+    }),
   ],
 };
