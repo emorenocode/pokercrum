@@ -25,7 +25,7 @@ export const environment = {
   production: ${process.env['ENVIRONMENT'] === 'prod'},
   firebase: {
     projectId: '${process.env['FIREBASE_PROJECT_ID']}',
-    apiId: '${process.env['FIREBASE_API_ID']}',
+    appId: '${process.env['FIREBASE_APP_ID']}',
     storageBucket: '${process.env['FIREBASE_STORAGE_BUCKET']}',
     apiKey: '${process.env['FIREBASE_API_KEY']}',
     authDomain: '${process.env['FIREBASE_AUTH_DOMAIN']}',
