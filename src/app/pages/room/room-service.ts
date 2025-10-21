@@ -45,7 +45,7 @@ export class RoomService {
     ).pipe(map(() => this.newRoom));
   }
 
-  getParticipants(roomCode: string) {
+  getPlayers(roomCode: string) {
     return from(collectionData(collection(this.firestore, 'rooms', roomCode, 'players')));
   }
 

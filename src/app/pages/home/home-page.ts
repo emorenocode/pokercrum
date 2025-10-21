@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RoomService } from '../room/room-service';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,7 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
   styleUrl: './home-page.css',
 })
 export class HomePage {
+  private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
   private readonly router = inject(Router);
   public readonly username = new FormControl<string | null>(null, Validators.required);
@@ -30,6 +32,10 @@ export class HomePage {
     this.roomService.createRoom(username).subscribe({
       next: (room: any) => {
         this.router.navigate(['/', room]);
+      },
+      error: () => {
+        this.isCreatingRoom.set(false);
+        this.snackbar.open('Error creating room', undefined, { duration: 3000 });
       },
     });
   }

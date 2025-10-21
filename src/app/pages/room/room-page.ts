@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface Card {
   value: string;
@@ -36,6 +37,7 @@ export function countCards(list: Player[]): Record<string, number> {
   styleUrl: './room-page.css',
 })
 export class RoomPage implements OnInit {
+  private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
   private readonly roomService = inject(RoomService);
   private readonly isInitialLoad = signal(true);
@@ -83,15 +85,19 @@ export class RoomPage implements OnInit {
 
           try {
             const success = this.clipboad.copy(this.currentUrl);
+            if (success) {
+              this.snackbar.open('Link copied successfully', undefined, { duration: 3000 });
+            }
           } catch (error) {
             console.error('Error to copy link ', error);
+            this.snackbar.open('Error copying link', undefined, { duration: 3000 });
           }
         },
       });
   }
 
   getPlayers() {
-    this.roomService.getParticipants(this.roomCode()).subscribe({
+    this.roomService.getPlayers(this.roomCode()).subscribe({
       next: (qs) => {
         this.players.set(qs as unknown as Player[]);
         this.players().forEach((player) => {
@@ -99,6 +105,9 @@ export class RoomPage implements OnInit {
             this.cardSelected.set(player.card);
           }
         });
+      },
+      error: () => {
+        this.snackbar.open('Error to get players', undefined, { duration: 3000 });
       },
     });
   }
@@ -124,9 +133,11 @@ export class RoomPage implements OnInit {
     const user = { ...this.player(), username } as Player;
 
     this.roomService.joinRoom(user, this.roomCode()).subscribe({
-      next: (res) => {
-        console.log('UserCreated ', res);
+      next: () => {
         this.player.set(user);
+      },
+      error: () => {
+        this.snackbar.open('Error to join room', undefined, { duration: 3000 });
       },
     });
   }
@@ -146,13 +157,20 @@ export class RoomPage implements OnInit {
       next: () => {
         this.showCards.set(true);
       },
+      error: () => {
+        this.snackbar.open('Error to show cards', undefined, { duration: 3000 });
+      },
     });
   }
 
   onSelectCard(card: Card) {
     this.cardSelected.set(card);
     const user = { ...this.player(), card } as Player;
-    this.roomService.selectCard(this.roomCode(), user).subscribe();
+    this.roomService.selectCard(this.roomCode(), user).subscribe({
+      error: () => {
+        this.snackbar.open('Error to select card', undefined, { duration: 3000 });
+      },
+    });
     this.isInitialLoad.set(false);
   }
 
@@ -160,6 +178,9 @@ export class RoomPage implements OnInit {
     this.roomService.onResetCards(this.roomCode(), this.players()).subscribe({
       next: () => {
         this.showCards.set(false);
+      },
+      error: () => {
+        this.snackbar.open('Error to reset cards', undefined, { duration: 3000 });
       },
     });
   }
@@ -180,6 +201,10 @@ export class RoomPage implements OnInit {
   }
 
   onDeletePlayer(playerId: string) {
-    this.roomService.onDeletePlayer(this.roomCode(), playerId).subscribe();
+    this.roomService.onDeletePlayer(this.roomCode(), playerId).subscribe({
+      error: () => {
+        this.snackbar.open('Error to delete player', undefined, { duration: 3000 });
+      },
+    });
   }
 }
