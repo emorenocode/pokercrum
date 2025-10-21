@@ -18,14 +18,14 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAnalytics(() => getAnalytics()),
-    ScreenTrackingService,
-    provideFirestore(() => getFirestore()),
     provideAppCheck(() => {
       return initializeAppCheck(undefined, {
         provider: new ReCaptchaV3Provider(environment.reCaptchaV3SiteKey),
         isTokenAutoRefreshEnabled: true,
       });
     }),
+    provideAnalytics(() => getAnalytics()),
+    ScreenTrackingService,
+    provideFirestore(() => getFirestore()),
   ],
 };
