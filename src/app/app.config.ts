@@ -6,7 +6,7 @@ import {
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
-import { initializeApp, provideFirebaseApp, getApp } from '@angular/fire/app';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAnalytics, provideAnalytics, ScreenTrackingService } from '@angular/fire/analytics';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
@@ -22,8 +22,7 @@ export const appConfig: ApplicationConfig = {
     ScreenTrackingService,
     provideFirestore(() => getFirestore()),
     provideAppCheck(() => {
-      const app = getApp();
-      return initializeAppCheck(app, {
+      return initializeAppCheck(undefined, {
         provider: new ReCaptchaV3Provider(environment.reCaptchaV3SiteKey),
         isTokenAutoRefreshEnabled: true,
       });
