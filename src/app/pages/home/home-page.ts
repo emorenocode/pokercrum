@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RoomService } from '../room/room-service';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,12 +10,23 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })
-export class HomePage {
+export class HomePage implements OnInit {
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
   private readonly router = inject(Router);
   public readonly username = new FormControl<string | null>(null, Validators.required);
   public readonly isCreatingRoom = signal(false);
+
+  ngOnInit(): void {
+    this.checkMyRooms();
+  }
+
+  checkMyRooms() {
+    const roomCode = localStorage.getItem('pcRoom');
+    if (roomCode) {
+      this.router.navigate(['/', roomCode]);
+    }
+  }
 
   onCreateRoom() {
     if (this.isCreatingRoom()) return;

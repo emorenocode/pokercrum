@@ -59,7 +59,7 @@
             <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
             <div class="card__back">{{ player.card?.value }}</div>
           </div>
-          @if (currentPlayer.role === 'admin') {
+          @if (currentPlayer.id === currentRoom?.createBy) {
           <button (click)="onDeletePlayer(player.id)">x</button>
           }
         </div>
@@ -84,7 +84,7 @@
       </div>
       } }
     </div>
-    @if (currentPlayer.role === 'admin') { @if (showCards()) {
+    @if (currentPlayer.id === currentRoom?.createBy) { @if (showCards()) {
     <button matButton="outlined" (click)="onResetCards()">Reset</button>
     } @else {
     <button matButton="outlined" (click)="onShowCards()">Reveal</button>

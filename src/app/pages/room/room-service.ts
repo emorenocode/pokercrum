@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
   Firestore,
+  getDoc,
   onSnapshot,
   setDoc,
   writeBatch,
@@ -23,26 +24,50 @@ export class RoomService {
   _currentPlayer = signal<Player>({
     username: '',
     id: nanoid(),
-    role: 'user',
   });
 
   get currentPlayer() {
     return this._currentPlayer;
   }
 
-  createRoom(username: string) {
-    this._currentPlayer.update((player) => ({ ...player, username, role: 'admin' }));
-    localStorage.setItem(
-      'pokercrum',
-      JSON.stringify({ room: this.newRoom, player: this.currentPlayer() })
-    );
+  getRoom(roomCode: string) {
+    const roomRef = doc(this.firestore, 'rooms', roomCode);
+    return from(getDoc(roomRef));
+  }
 
-    return from(
-      setDoc(
-        doc(this.firestore, 'rooms', this.newRoom, 'players', this.currentPlayer()!.id),
-        this.currentPlayer()
-      )
-    ).pipe(map(() => this.newRoom));
+  createRoom(username: string) {
+    this._currentPlayer.update((player) => ({ ...player, username }));
+
+    const batch = writeBatch(this.firestore);
+    const room = {
+      id: this.newRoom,
+      name: '',
+      createBy: this.currentPlayer().id,
+      createAt: new Date(),
+    };
+    const roomRef = doc(this.firestore, 'rooms', this.newRoom);
+    batch.set(roomRef, room);
+    const playerRef = doc(
+      this.firestore,
+      'rooms',
+      this.newRoom,
+      'players',
+      this.currentPlayer().id
+    );
+    batch.set(playerRef, this.currentPlayer());
+
+    return from(batch.commit()).pipe(
+      map(() => {
+        this.saveLocalData(this.newRoom, this.currentPlayer());
+        return this.newRoom;
+      })
+    );
+  }
+
+  private saveLocalData(roomCode: string, player: Player) {
+    const data = JSON.stringify(player);
+    localStorage.setItem('pcRoom', roomCode);
+    localStorage.setItem('pcUser', data);
   }
 
   getPlayers(roomCode: string) {
@@ -53,7 +78,7 @@ export class RoomService {
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
       map(() => player),
       tap(() => {
-        localStorage.setItem('pokercrum', JSON.stringify({ room: roomCode, player }));
+        this.saveLocalData(roomCode, player);
       })
     );
   }
@@ -81,7 +106,7 @@ export class RoomService {
   onResetCards(roomCode: string, players: Player[]) {
     const batch = writeBatch(this.firestore);
     players.forEach((player) => {
-      const playerUpdate: Player = { id: player.id, username: player.username, role: player.role };
+      const playerUpdate: Player = { id: player.id, username: player.username };
       const playerRef = doc(this.firestore, 'rooms', roomCode, 'players', player.id);
       batch.set(playerRef, { ...playerUpdate });
     });

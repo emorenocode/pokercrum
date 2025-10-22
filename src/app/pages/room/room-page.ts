@@ -16,7 +16,6 @@ export interface Card {
 export interface Player {
   id: string;
   username: string;
-  role: 'admin' | 'user';
   card?: Card;
 }
 
@@ -68,11 +67,23 @@ export class RoomPage implements OnInit {
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl();
   public result!: Record<string, number>;
+  currentRoom: any;
 
   ngOnInit(): void {
     this.checkUser();
     this.getPlayers();
     this.onListenerReveal();
+    this.getRoom();
+  }
+
+  getRoom() {
+    this.roomService.getRoom(this.roomCode()).subscribe({
+      next: (doc) => {
+        if (doc.exists()) {
+          this.currentRoom = doc.data();
+        }
+      },
+    });
   }
 
   openDialogToShared(template: TemplateRef<any>) {
@@ -113,11 +124,11 @@ export class RoomPage implements OnInit {
   }
 
   checkUser() {
-    const roomStored = localStorage.getItem('pokercrum');
-    if (roomStored) {
-      const state = JSON.parse(roomStored);
-      if (state.room === this.roomCode() && state.player) {
-        this.player.set(state.player);
+    const userStored = localStorage.getItem('pcUser');
+    if (userStored) {
+      const state = JSON.parse(userStored);
+      if (state) {
+        this.player.set(state);
       }
     }
   }
