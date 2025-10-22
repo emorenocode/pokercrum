@@ -9,9 +9,12 @@
     <button mat-icon-button (click)="openDialogToShared(dialogToShared)">
       <mat-icon>share</mat-icon>
     </button>
-    <div class="player" title="{{ currentPlayer.username }}">
+    <div class="player" title="{{ currentPlayer.username }}" [matMenuTriggerFor]="menu">
       {{ currentPlayer.username.toUpperCase().slice(0, 2) }}
     </div>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item [routerLink]="['/', currentPlayer.room]">My Room</button>
+    </mat-menu>
     }
   </nav>
 </header>

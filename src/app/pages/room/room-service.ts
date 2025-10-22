@@ -36,7 +36,7 @@ export class RoomService {
   }
 
   createRoom(username: string) {
-    this._currentPlayer.update((player) => ({ ...player, username }));
+    this._currentPlayer.update((player) => ({ ...player, username, room: this.newRoom }));
 
     const batch = writeBatch(this.firestore);
     const room = {
