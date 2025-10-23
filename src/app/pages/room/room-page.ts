@@ -103,7 +103,6 @@ export class RoomPage implements OnInit {
   getRoom() {
     this.roomService.getRoom(this.roomCode()).subscribe({
       next: (doc) => {
-        console.log('Room ', doc.data());
         if (doc.exists()) {
           this.currentRoom.set(doc.data());
         }

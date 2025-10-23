@@ -25,7 +25,9 @@ export class HomePage implements OnInit {
     const userStored = localStorage.getItem('pcUser');
     if (userStored) {
       const userState = JSON.parse(userStored);
-      this.router.navigate(['/', userState.room]);
+      if (userState.room) {
+        this.router.navigate(['/', userState.room]);
+      }
     }
   }
 

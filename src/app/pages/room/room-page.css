@@ -127,6 +127,7 @@ main {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: inherit;
+  background-color: #fff;
 }
 
 .card__front {
