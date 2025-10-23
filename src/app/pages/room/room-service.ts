@@ -11,6 +11,7 @@ import {
   getDoc,
   onSnapshot,
   setDoc,
+  updateDoc,
   writeBatch,
 } from '@angular/fire/firestore';
 
@@ -43,7 +44,8 @@ export class RoomService {
       id: this.newRoom,
       name: '',
       createBy: this.currentPlayer().id,
-      createAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     const roomRef = doc(this.firestore, 'rooms', this.newRoom);
     batch.set(roomRef, room);
@@ -58,15 +60,14 @@ export class RoomService {
 
     return from(batch.commit()).pipe(
       map(() => {
-        this.saveLocalData(this.newRoom, this.currentPlayer());
+        this.saveLocalData(this.currentPlayer());
         return this.newRoom;
       })
     );
   }
 
-  private saveLocalData(roomCode: string, player: Player) {
+  private saveLocalData(player: Player) {
     const data = JSON.stringify(player);
-    localStorage.setItem('pcRoom', roomCode);
     localStorage.setItem('pcUser', data);
   }
 
@@ -78,7 +79,7 @@ export class RoomService {
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
       map(() => player),
       tap(() => {
-        this.saveLocalData(roomCode, player);
+        this.saveLocalData(player);
       })
     );
   }
@@ -88,7 +89,7 @@ export class RoomService {
   }
 
   onReveal(roomCode: string, show: boolean) {
-    return from(setDoc(doc(this.firestore, 'rooms', roomCode), { show }));
+    return from(updateDoc(doc(this.firestore, 'rooms', roomCode), { show, updatedAt: new Date() }));
   }
 
   getReveal(roomCode: string) {
@@ -112,7 +113,7 @@ export class RoomService {
     });
 
     const showRef = doc(this.firestore, 'rooms', roomCode);
-    batch.set(showRef, { show: false });
+    batch.update(showRef, { show: false, updatedAt: new Date() });
 
     return from(batch.commit());
   }

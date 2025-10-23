@@ -1,15 +1,7 @@
-import {
-  Component,
-  inject,
-  input,
-  OnChanges,
-  signal,
-  SimpleChanges,
-  TemplateRef,
-} from '@angular/core';
+import { Component, inject, input, OnInit, signal, TemplateRef } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -52,7 +44,8 @@ export function countCards(list: Player[]): Record<string, number> {
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
-export class RoomPage implements OnChanges {
+export class RoomPage implements OnInit {
+  private readonly router = inject(Router);
   private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
   private readonly roomService = inject(RoomService);
@@ -84,22 +77,35 @@ export class RoomPage implements OnChanges {
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl();
   public result!: Record<string, number>;
-  currentRoom: any;
+  public readonly currentRoom = signal<any | undefined>(undefined);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['roomCode']) {
-      this.checkUser();
-      this.getPlayers();
-      this.onListenerReveal();
-      this.getRoom();
+  ngOnInit(): void {
+    this.checkUser();
+    this.getPlayers();
+    this.onListenerReveal();
+    this.getRoom();
+  }
+
+  createRoom() {
+    this.roomService.createRoom(this.player().username).subscribe({
+      next: (roomCode) => {
+        this.goToRoom(roomCode);
+      },
+    });
+  }
+
+  goToRoom(roomCode: string) {
+    if (roomCode) {
+      this.router.navigate(['/', roomCode]);
     }
   }
 
   getRoom() {
     this.roomService.getRoom(this.roomCode()).subscribe({
       next: (doc) => {
+        console.log('Room ', doc.data());
         if (doc.exists()) {
-          this.currentRoom = doc.data();
+          this.currentRoom.set(doc.data());
         }
       },
     });
@@ -219,7 +225,16 @@ export class RoomPage implements OnChanges {
     this.roomService.getReveal(this.roomCode()).subscribe({
       next: (res) => {
         if (res) {
-          this.onShowCards();
+          const result = countCards(this.players());
+          const resultList: Card[] = [];
+
+          Object.entries(result).forEach(([key, value]) => {
+            resultList.push({
+              value: key,
+              label: value.toString(),
+            });
+          });
+          this.cardResult.set(resultList);
         } else {
           if (!this.isInitialLoad()) {
             this.cardSelected.set(undefined);

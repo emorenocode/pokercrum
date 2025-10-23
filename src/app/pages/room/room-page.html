@@ -13,7 +13,11 @@
       {{ currentPlayer.username.toUpperCase().slice(0, 2) }}
     </div>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item [routerLink]="['/', currentPlayer.room]">My Room</button>
+      @if (currentPlayer.room) {
+      <button mat-menu-item (click)="goToRoom(currentPlayer.room)">My Room</button>
+      } @else {
+      <button mat-menu-item (click)="createRoom()">Create Room</button>
+      }
     </mat-menu>
     }
   </nav>
@@ -62,7 +66,7 @@
             <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
             <div class="card__back">{{ player.card?.value }}</div>
           </div>
-          @if (currentPlayer.id === currentRoom?.createBy) {
+          @if (currentPlayer.id === currentRoom()?.createBy) {
           <button (click)="onDeletePlayer(player.id)">x</button>
           }
         </div>
@@ -87,7 +91,7 @@
       </div>
       } }
     </div>
-    @if (currentPlayer.id === currentRoom?.createBy) { @if (showCards()) {
+    @if (currentPlayer.id === currentRoom()?.createBy) { @if (showCards()) {
     <button matButton="outlined" (click)="onResetCards()">Reset</button>
     } @else {
     <button matButton="outlined" (click)="onShowCards()">Reveal</button>

@@ -22,9 +22,10 @@ export class HomePage implements OnInit {
   }
 
   checkMyRooms() {
-    const roomCode = localStorage.getItem('pcRoom');
-    if (roomCode) {
-      this.router.navigate(['/', roomCode]);
+    const userStored = localStorage.getItem('pcUser');
+    if (userStored) {
+      const userState = JSON.parse(userStored);
+      this.router.navigate(['/', userState.room]);
     }
   }
 
