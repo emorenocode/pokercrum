@@ -200,6 +200,7 @@ section {
     font-size: 14px;
     outline: 1px solid;
     border-radius: 10px;
+    overflow: hidden;
   }
 }
 
