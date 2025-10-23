@@ -2,11 +2,11 @@
 
 <header class="navbar">
   <div class="logo">
-    <a [routerLink]="['/']">PokerCrum</a>
+    <h1>PokerCrum</h1>
   </div>
   <nav>
     @if (currentPlayer.username != '') {
-    <button mat-icon-button (click)="openDialogToShared(dialogToShared)">
+    <button mat-icon-button title="Share Room" (click)="openDialogToShared(dialogToShared)">
       <mat-icon>share</mat-icon>
     </button>
     <div class="player" title="{{ currentPlayer.username }}" [matMenuTriggerFor]="menu">
@@ -16,7 +16,7 @@
       @if (currentPlayer.room) {
       <button mat-menu-item (click)="goToRoom(currentPlayer.room)">My Room</button>
       } @else {
-      <!-- <button mat-menu-item (click)="createRoom()">Create Room</button> -->
+      <button mat-menu-item (click)="createRoom()">Create Room</button>
       }
     </mat-menu>
     }
@@ -43,7 +43,7 @@
         [class.selected]="card.value === cardSelected()?.value"
         [class.disabled]="showCards()"
         (click)="onSelectCard(card)"
-        title="{{ card.label }}"
+        matTooltip="{{ card.label }}"
       >
         <div class="card__inner">
           <div class="card__front">🔥</div>
@@ -67,7 +67,7 @@
             <div class="card__back">{{ player.card?.value }}</div>
           </div>
           @if (currentPlayer.id === currentRoom()?.createBy) {
-          <button (click)="onDeletePlayer(player.id)">x</button>
+          <button title="Delete Player" (click)="onDeletePlayer(player.id)">x</button>
           }
         </div>
         <span>{{ player.username }}</span>

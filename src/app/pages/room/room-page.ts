@@ -1,13 +1,23 @@
-import { Component, inject, input, OnInit, signal, TemplateRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  OnChanges,
+  OnInit,
+  signal,
+  SimpleChanges,
+  TemplateRef,
+} from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface Card {
   value: string;
@@ -35,16 +45,16 @@ export function countCards(list: Player[]): Record<string, number> {
   selector: 'app-room',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
     MatMenuModule,
+    MatTooltipModule,
   ],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
-export class RoomPage implements OnInit {
+export class RoomPage implements OnInit, OnChanges {
   private readonly router = inject(Router);
   private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
@@ -53,20 +63,20 @@ export class RoomPage implements OnInit {
 
   public readonly showCards = signal(false);
   public readonly cards = signal<Card[]>([
-    { value: '0', label: '' },
-    { value: '1/2', label: 'Tarea muy pequeña' },
-    { value: '1', label: 'Tarea pequeña' },
-    { value: '2', label: 'Tarea pequeña' },
-    { value: '3', label: 'Tarea pequeńa' },
-    { value: '5', label: 'Tarea mediana' },
-    { value: '8', label: 'Tarea mediana' },
-    { value: '13', label: 'Tarea mediana' },
-    { value: '20', label: 'Tarea grande' },
-    { value: '40', label: 'Tarea grande' },
-    { value: '100', label: 'Tarea muy grande' },
-    { value: '?', label: 'Tarea Inestimable' },
-    { value: '♾️', label: 'Tarea enorme' },
-    { value: '☕️', label: 'Hora de una pause' },
+    { value: '0', label: 'No effort (already done or trivial)' },
+    { value: '1/2', label: 'Tiny effort (almost nothing)' },
+    { value: '1', label: 'Very small effort (quick change)' },
+    { value: '2', label: 'Small effort (simple task)' },
+    { value: '3', label: 'Medium effort (moderate complexity)' },
+    { value: '5', label: 'Medium to large effort (some complexity)' },
+    { value: '8', label: 'Large effort (complex or multi-step)' },
+    { value: '13', label: 'Very large effort (significant work)' },
+    { value: '20', label: 'Huge effort (requires planning)' },
+    { value: '40', label: 'Massive effort (multiple sprints)' },
+    { value: '100', label: 'Enormous effort (likely needs to be split)' },
+    { value: '?', label: 'Unclear — needs clarification before estimating' },
+    { value: '♾️', label: 'Too big to estimate — break it down' },
+    { value: '☕️', label: 'Time for a break ☕️' },
   ]);
   public readonly players = signal<Player[]>([]);
   public readonly cardSelected = signal<Card | undefined>(undefined);
@@ -79,11 +89,18 @@ export class RoomPage implements OnInit {
   public result!: Record<string, number>;
   public readonly currentRoom = signal<any | undefined>(undefined);
 
+  constructor() {}
+
   ngOnInit(): void {
     this.checkUser();
-    this.getPlayers();
-    this.onListenerReveal();
-    this.getRoom();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['roomCode']) {
+      this.getPlayers();
+      this.onListenerReveal();
+      this.getRoom();
+    }
   }
 
   createRoom() {
