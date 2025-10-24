@@ -3,7 +3,6 @@ import {
   inject,
   input,
   OnChanges,
-  OnInit,
   signal,
   SimpleChanges,
   TemplateRef,
@@ -54,7 +53,7 @@ export function countCards(list: Player[]): Record<string, number> {
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
-export class RoomPage implements OnInit, OnChanges {
+export class RoomPage implements OnChanges {
   private readonly router = inject(Router);
   private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
@@ -90,10 +89,6 @@ export class RoomPage implements OnInit, OnChanges {
   public readonly currentRoom = signal<any | undefined>(undefined);
 
   constructor() {}
-
-  ngOnInit(): void {
-    this.checkUser();
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['roomCode']) {
@@ -162,16 +157,6 @@ export class RoomPage implements OnInit, OnChanges {
         this.snackbar.open('Error to get players', undefined, { duration: 3000 });
       },
     });
-  }
-
-  checkUser() {
-    const userStored = localStorage.getItem('pcUser');
-    if (userStored) {
-      const state = JSON.parse(userStored);
-      if (state) {
-        this.player.set(state);
-      }
-    }
   }
 
   onJoinRoom() {

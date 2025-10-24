@@ -20,15 +20,39 @@ import {
 })
 export class RoomService {
   private readonly firestore = inject(Firestore);
-  private newRoom = nanoid();
-
-  _currentPlayer = signal<Player>({
+  private readonly newRoom = nanoid();
+  private readonly _currentPlayer = signal<Player>({
     username: '',
     id: nanoid(),
   });
 
+  constructor() {
+    this.checkPlayer();
+  }
+
   get currentPlayer() {
     return this._currentPlayer;
+  }
+
+  checkPlayer() {
+    const playerStored = localStorage.getItem('pcUser');
+    let player;
+
+    if (!playerStored) return;
+
+    try {
+      const playerDecoded = atob(playerStored);
+      player = JSON.parse(playerDecoded);
+    } catch (error) {
+      try {
+        player = JSON.parse(playerStored);
+        this.saveLocalData(player);
+      } catch (error) {}
+    }
+
+    if (!player) return;
+
+    this._currentPlayer.set(player);
   }
 
   getRoom(roomCode: string) {
@@ -43,7 +67,7 @@ export class RoomService {
     const room = {
       id: this.newRoom,
       name: '',
-      createBy: this.currentPlayer().id,
+      createdBy: this.currentPlayer().id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -67,7 +91,7 @@ export class RoomService {
   }
 
   private saveLocalData(player: Player) {
-    const data = JSON.stringify(player);
+    const data = btoa(JSON.stringify(player));
     localStorage.setItem('pcUser', data);
   }
 
