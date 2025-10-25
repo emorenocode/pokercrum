@@ -1,22 +1,10 @@
-import {
-  Component,
-  inject,
-  input,
-  OnChanges,
-  signal,
-  SimpleChanges,
-  TemplateRef,
-} from '@angular/core';
+import { Component, inject, input, OnChanges, signal, SimpleChanges } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { Clipboard } from '@angular/cdk/clipboard';
+import { MatButton } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Header } from '../../shared/components/header/header';
 
 export interface Card {
   value: string;
@@ -42,21 +30,12 @@ export function countCards(list: Player[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [
-    ReactiveFormsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatMenuModule,
-    MatTooltipModule,
-  ],
+  imports: [ReactiveFormsModule, MatButton, MatTooltipModule, Header],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
 export class RoomPage implements OnChanges {
-  private readonly router = inject(Router);
   private readonly snackbar = inject(MatSnackBar);
-  private readonly clipboad = inject(Clipboard);
   private readonly roomService = inject(RoomService);
   private readonly isInitialLoad = signal(true);
 
@@ -80,8 +59,6 @@ export class RoomPage implements OnChanges {
   public readonly players = signal<Player[]>([]);
   public readonly cardSelected = signal<Card | undefined>(undefined);
   public readonly cardResult = signal<Card[]>([]);
-  public readonly dialog = inject(MatDialog);
-  public readonly currentUrl = location.href;
   public readonly player = this.roomService.currentPlayer;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl();
@@ -98,20 +75,6 @@ export class RoomPage implements OnChanges {
     }
   }
 
-  createRoom() {
-    this.roomService.createRoom(this.player().username).subscribe({
-      next: (roomCode) => {
-        this.goToRoom(roomCode);
-      },
-    });
-  }
-
-  goToRoom(roomCode: string) {
-    if (roomCode) {
-      this.router.navigate(['/', roomCode]);
-    }
-  }
-
   getRoom() {
     this.roomService.getRoom(this.roomCode()).subscribe({
       next: (doc) => {
@@ -120,27 +83,6 @@ export class RoomPage implements OnChanges {
         }
       },
     });
-  }
-
-  openDialogToShared(template: TemplateRef<any>) {
-    this.dialog
-      .open(template)
-      .afterClosed()
-      .subscribe({
-        next: (res) => {
-          if (!res) return;
-
-          try {
-            const success = this.clipboad.copy(this.currentUrl);
-            if (success) {
-              this.snackbar.open('Link copied successfully', undefined, { duration: 3000 });
-            }
-          } catch (error) {
-            console.error('Error to copy link ', error);
-            this.snackbar.open('Error copying link', undefined, { duration: 3000 });
-          }
-        },
-      });
   }
 
   getPlayers() {

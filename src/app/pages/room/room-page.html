@@ -1,36 +1,5 @@
 @let currentPlayer = player();
-
-<header class="navbar">
-  <div class="logo">
-    <h1>PokerCrum</h1>
-  </div>
-  <nav>
-    @if (currentPlayer.username != '') {
-    <button mat-icon-button title="Share Room" (click)="openDialogToShared(dialogToShared)">
-      <mat-icon>share</mat-icon>
-    </button>
-    <div class="player" title="{{ currentPlayer.username }}" [matMenuTriggerFor]="menu">
-      {{ currentPlayer.username.toUpperCase().slice(0, 2) }}
-    </div>
-    <mat-menu #menu="matMenu">
-      @if (currentPlayer.room) {
-      <button mat-menu-item (click)="goToRoom(currentPlayer.room)">My Room</button>
-      } @else {
-      <button mat-menu-item (click)="createRoom()">Create Room</button>
-      }
-    </mat-menu>
-    }
-  </nav>
-</header>
-
-<ng-template #dialogToShared>
-  <div class="dialog-to-shared">
-    <div class="link">
-      {{ currentUrl }}
-    </div>
-    <button matButton [mat-dialog-close]="true">Copy Link</button>
-  </div>
-</ng-template>
+<app-header />
 
 <main>
   @if (currentPlayer.username != '') {
