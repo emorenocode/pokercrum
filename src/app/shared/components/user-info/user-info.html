@@ -1,0 +1,18 @@
+<div class="container">
+  <div>
+    <div
+      class="username"
+      [class.invalid]="invalidUsername"
+      [contentEditable]="true"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+    >
+      {{ player().username }}
+    </div>
+  </div>
+  @if (player().room) {
+  <button (click)="goToRoom(player().room)">My Room</button>
+  } @else {
+  <button (click)="createRoom()">Create Room</button>
+  }
+</div>

@@ -9,16 +9,9 @@
     <button mat-icon-button title="Share Room" (click)="openDialogToShared(dialogToShared)">
       <mat-icon>share</mat-icon>
     </button>
-    <div class="player" title="{{ currentplayer.username }}" [matMenuTriggerFor]="menu">
+    <div class="player" title="{{ currentplayer.username }}" #avatar (click)="openUserInfo(avatar)">
       {{ player().username.toUpperCase().slice(0, 2) }}
     </div>
-    <mat-menu #menu="matMenu">
-      @if (currentplayer.room) {
-      <button mat-menu-item (click)="goToRoom(currentplayer.room)">My Room</button>
-      } @else {
-      <button mat-menu-item (click)="createRoom()">Create Room</button>
-      }
-    </mat-menu>
     }
   </nav>
 </header>

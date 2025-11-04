@@ -145,4 +145,9 @@ export class RoomService {
   onDeletePlayer(roomCode: string, playerId: string) {
     return from(deleteDoc(doc(this.firestore, 'rooms', roomCode, 'players', playerId)));
   }
+
+  updatePlayer(updatedPlayer: Player) {
+    this.saveLocalData(updatedPlayer);
+    this.checkPlayer();
+  }
 }

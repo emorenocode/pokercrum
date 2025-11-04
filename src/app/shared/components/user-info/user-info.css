@@ -1,0 +1,32 @@
+.container {
+  outline: 1px solid;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 5px;
+  background-color: #fff;
+  min-width: 200px;
+
+  .username {
+    text-align: center;
+    outline: none;
+    padding: 10px;
+    border-bottom: 1px solid #cecece;
+
+    &.invalid {
+      background-color: rgb(214, 48, 48);
+    }
+  }
+
+  button {
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px 5px;
+
+    &:hover {
+      background-color: #cecece;
+    }
+  }
+}
