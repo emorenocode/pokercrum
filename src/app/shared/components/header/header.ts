@@ -1,4 +1,4 @@
-import { Component, inject, TemplateRef } from '@angular/core';
+import { Component, computed, inject, TemplateRef } from '@angular/core';
 import { RoomService } from '../../../pages/room/room-service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -17,20 +17,29 @@ import { UserInfo } from '../user-info/user-info';
   styleUrl: './header.css',
 })
 export class Header {
-  openUserInfo(origin: HTMLElement) {
-    this.overlayContent.open(origin, UserInfo);
-  }
   private readonly overlayContent = inject(OverlayContent);
-
   private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
   private readonly dialog = inject(MatDialog);
   private readonly roomService = inject(RoomService);
   public readonly currentUrl = location.href;
   public readonly player = this.roomService.currentPlayer;
-  public isOpen = false;
+  public readonly username = computed(() => {
+    const username = this.player().username.toUpperCase().split(' ');
+    let letters = username[0].slice(0, 2);
+
+    if (username.length >= 2) {
+      letters = `${username[0][0]}${username[1][0]}`;
+    }
+
+    return letters;
+  });
 
   constructor() {}
+
+  openUserInfo(origin: HTMLElement) {
+    this.overlayContent.open(origin, UserInfo);
+  }
 
   openDialogToShared(template: TemplateRef<any>) {
     this.dialog

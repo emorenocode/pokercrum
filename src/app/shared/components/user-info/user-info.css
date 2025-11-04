@@ -17,6 +17,13 @@
       background-color: rgb(214, 48, 48);
       color: #fff;
     }
+
+    &:hover::after {
+      content: '✏️';
+      margin-left: 6px;
+      font-size: 0.9em;
+      position: absolute;
+    }
   }
 
   button {
