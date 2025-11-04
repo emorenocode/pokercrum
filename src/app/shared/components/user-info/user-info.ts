@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RoomService } from '../../../pages/room/room-service';
 import { Player } from '../../../pages/room/room-page';
 import { Router } from '@angular/router';
@@ -15,6 +15,7 @@ export class UserInfo {
   private readonly router = inject(Router);
   private readonly roomService = inject(RoomService);
   public readonly player = this.roomService.currentPlayer;
+  public readonly currentRoom = computed(() => this.roomService.currentRoom());
   username?: string;
   invalidUsername = false;
 

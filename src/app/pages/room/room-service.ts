@@ -26,6 +26,8 @@ export class RoomService {
     id: nanoid(),
   });
 
+  public readonly currentRoom = signal<any>('');
+
   constructor() {
     this.checkPlayer();
   }

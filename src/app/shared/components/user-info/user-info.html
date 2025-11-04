@@ -10,9 +10,9 @@
       {{ player().username }}
     </div>
   </div>
-  @if (player().room) {
+  @if (player().room) { @if (currentRoom()?.createdBy !== player().id) {
   <button (click)="goToRoom(player().room)">My Room</button>
-  } @else {
+  } } @else {
   <button (click)="createRoom()">Create Room</button>
   }
 </div>

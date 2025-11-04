@@ -1,4 +1,12 @@
-import { Component, inject, input, OnChanges, signal, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnChanges,
+  signal,
+  SimpleChanges,
+} from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -63,7 +71,7 @@ export class RoomPage implements OnChanges {
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl();
   public result!: Record<string, number>;
-  public readonly currentRoom = signal<any | undefined>(undefined);
+  public readonly currentRoom = computed<any>(() => this.roomService.currentRoom());
 
   constructor() {}
 
@@ -79,7 +87,7 @@ export class RoomPage implements OnChanges {
     this.roomService.getRoom(this.roomCode()).subscribe({
       next: (doc) => {
         if (doc.exists()) {
-          this.currentRoom.set(doc.data());
+          this.roomService.currentRoom.set(doc.data());
         }
       },
     });
