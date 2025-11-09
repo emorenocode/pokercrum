@@ -1,5 +1,5 @@
 import { Component, computed, inject, TemplateRef } from '@angular/core';
-import { RoomService } from '../../../pages/room/room-service';
+import { RoomService } from '@/app/pages/room/room-service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogClose } from '@angular/material/dialog';
@@ -7,7 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { OverlayContent } from '../../../core/services/overlay-content';
+import { OverlayContent } from '@/app/core/services/overlay-content';
 import { UserInfo } from '../user-info/user-info';
 
 @Component({

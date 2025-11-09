@@ -1,8 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
-import { RoomService } from '../../../pages/room/room-service';
-import { Player } from '../../../pages/room/room-page';
+import { RoomService } from '@/app/pages/room/room-service';
+import { Player } from '@/app/pages/room/room-page';
 import { Router } from '@angular/router';
-import { OverlayContent } from '../../../core/services/overlay-content';
+import { OverlayContent } from '@/app/core/services/overlay-content';
 
 @Component({
   selector: 'app-user-info',

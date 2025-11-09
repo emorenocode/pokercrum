@@ -12,7 +12,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Header } from '../../shared/components/header/header';
+import { Header } from '@/app/shared/components/header/header';
 
 export interface Card {
   value: string;
