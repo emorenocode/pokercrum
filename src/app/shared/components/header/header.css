@@ -34,6 +34,9 @@
   flex-direction: column;
   justify-content: center;
   gap: 10px;
+  outline: 1px solid;
+  border-radius: 8px;
+  background-color: #fff;
 
   .link {
     padding: 10px;

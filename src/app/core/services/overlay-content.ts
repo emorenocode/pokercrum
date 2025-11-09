@@ -1,6 +1,6 @@
-import { Injectable, Injector } from '@angular/core';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
+import { Injectable, Injector, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ComponentType, Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal, TemplatePortal } from '@angular/cdk/portal';
 
 @Injectable({ providedIn: 'root' })
 export class OverlayContent {
@@ -8,7 +8,12 @@ export class OverlayContent {
 
   constructor(private overlay: Overlay, private injector: Injector) {}
 
-  open<T>(origin: HTMLElement, component: any, data?: any) {
+  open<T = any>(
+    origin: HTMLElement,
+    componentOrTemplate: ComponentType<T> | TemplateRef<T>,
+    data?: any,
+    viewContainerRef?: ViewContainerRef
+  ) {
     this.close();
 
     const positionStrategy = this.overlay
@@ -38,7 +43,15 @@ export class OverlayContent {
 
     this.overlayRef.backdropClick().subscribe(() => this.close());
 
-    const portal = new ComponentPortal(component, null, this.injector);
+    let portal: any;
+
+    if (componentOrTemplate instanceof TemplateRef && viewContainerRef) {
+      const context: any = data ? { $implicit: data } : null;
+      portal = new TemplatePortal(componentOrTemplate, viewContainerRef, context, this.injector);
+    } else if (typeof componentOrTemplate === 'function') {
+      portal = new ComponentPortal(componentOrTemplate, null, this.injector);
+    }
+
     const componentRef = this.overlayRef.attach(portal);
 
     return {

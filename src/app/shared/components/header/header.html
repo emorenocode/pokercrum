@@ -6,7 +6,12 @@
   </div>
   <nav>
     @if (currentplayer.username != '') {
-    <button mat-icon-button title="Share Room" (click)="openDialogToShared(dialogToShared)">
+    <button
+      mat-icon-button
+      title="Share Room"
+      #shared
+      (click)="openToShared(shared._elementRef.nativeElement, dialogToShared)"
+    >
       <mat-icon>share</mat-icon>
     </button>
     <div class="player" title="{{ currentplayer.username }}" #avatar (click)="openUserInfo(avatar)">
@@ -21,6 +26,6 @@
     <div class="link">
       {{ link }}
     </div>
-    <button matButton [mat-dialog-close]="true">Copy Link</button>
+    <button matButton (click)="copyLink()">Copy Link</button>
   </div>
 </ng-template>
