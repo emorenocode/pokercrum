@@ -4,6 +4,7 @@ import {
   inject,
   input,
   OnChanges,
+  OnDestroy,
   signal,
   SimpleChanges,
 } from '@angular/core';
@@ -13,6 +14,7 @@ import { MatButton } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
+import { Subject, takeUntil } from 'rxjs';
 
 export interface Card {
   value: string;
@@ -42,7 +44,8 @@ export function countCards(list: Player[]): Record<string, number> {
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
-export class RoomPage implements OnChanges {
+export class RoomPage implements OnChanges, OnDestroy {
+  private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
   private readonly isInitialLoad = signal(true);
@@ -75,8 +78,14 @@ export class RoomPage implements OnChanges {
 
   constructor() {}
 
+  ngOnDestroy(): void {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['roomCode']) {
+      this.onDestroy$.next();
       this.getPlayers();
       this.onListenerReveal();
       this.getRoom();
@@ -94,19 +103,22 @@ export class RoomPage implements OnChanges {
   }
 
   getPlayers() {
-    this.roomService.getPlayers(this.roomCode()).subscribe({
-      next: (qs) => {
-        this.players.set(qs as unknown as Player[]);
-        this.players().forEach((player) => {
-          if (player.id === this.player().id) {
-            this.cardSelected.set(player.card);
-          }
-        });
-      },
-      error: () => {
-        this.snackbar.open('Error to get players', undefined, { duration: 3000 });
-      },
-    });
+    this.roomService
+      .getPlayers(this.roomCode())
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe({
+        next: (qs) => {
+          this.players.set(qs as unknown as Player[]);
+          this.players().forEach((player) => {
+            if (player.id === this.player().id) {
+              this.cardSelected.set(player.card);
+            }
+          });
+        },
+        error: () => {
+          this.snackbar.open('Error to get players', undefined, { duration: 3000 });
+        },
+      });
   }
 
   onJoinRoom() {
@@ -151,6 +163,8 @@ export class RoomPage implements OnChanges {
   }
 
   onSelectCard(card: Card) {
+    if (this.showCards()) return;
+
     this.cardSelected.set(card);
     const user = { ...this.player(), card } as Player;
     this.roomService.selectCard(this.roomCode(), user).subscribe({
@@ -173,27 +187,30 @@ export class RoomPage implements OnChanges {
   }
 
   onListenerReveal() {
-    this.roomService.getReveal(this.roomCode()).subscribe({
-      next: (res) => {
-        if (res) {
-          const result = countCards(this.players());
-          const resultList: Card[] = [];
+    this.roomService
+      .getReveal(this.roomCode())
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            const result = countCards(this.players());
+            const resultList: Card[] = [];
 
-          Object.entries(result).forEach(([key, value]) => {
-            resultList.push({
-              value: key,
-              label: value.toString(),
+            Object.entries(result).forEach(([key, value]) => {
+              resultList.push({
+                value: key,
+                label: value.toString(),
+              });
             });
-          });
-          this.cardResult.set(resultList);
-        } else {
-          if (!this.isInitialLoad()) {
-            this.cardSelected.set(undefined);
+            this.cardResult.set(resultList);
+          } else {
+            if (!this.isInitialLoad()) {
+              this.cardSelected.set(undefined);
+            }
           }
-        }
-        this.showCards.set(res);
-      },
-    });
+          this.showCards.set(res);
+        },
+      });
   }
 
   onDeletePlayer(playerId: string) {

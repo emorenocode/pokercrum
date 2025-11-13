@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { from, map, Subject, tap } from 'rxjs';
+import { finalize, from, map, Subject, tap } from 'rxjs';
 import { Player } from './room-page';
 import { nanoid } from 'nanoid';
 import {
@@ -98,7 +98,7 @@ export class RoomService {
   }
 
   getPlayers(roomCode: string) {
-    return from(collectionData(collection(this.firestore, 'rooms', roomCode, 'players')));
+    return collectionData(collection(this.firestore, 'rooms', roomCode, 'players'));
   }
 
   joinRoom(player: Player, roomCode: string) {
@@ -121,13 +121,13 @@ export class RoomService {
   getReveal(roomCode: string) {
     const observer = new Subject<boolean>();
 
-    onSnapshot(doc(this.firestore, 'rooms', roomCode), (doc) => {
+    const unsubscribe = onSnapshot(doc(this.firestore, 'rooms', roomCode), (doc) => {
       if (doc.exists()) {
         observer.next(doc.data()['show']);
       }
     });
 
-    return observer.asObservable();
+    return observer.asObservable().pipe(finalize(() => unsubscribe()));
   }
 
   onResetCards(roomCode: string, players: Player[]) {
