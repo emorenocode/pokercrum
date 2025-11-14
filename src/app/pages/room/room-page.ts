@@ -14,7 +14,7 @@ import { MatButton } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 
 export interface Card {
   value: string;
@@ -142,24 +142,17 @@ export class RoomPage implements OnChanges, OnDestroy {
   }
 
   onShowCards() {
-    const result = countCards(this.players());
-    const resultList: Card[] = [];
-
-    Object.entries(result).forEach(([key, value]) => {
-      resultList.push({
-        value: key,
-        label: value.toString(),
+    this.roomService
+      .onReveal(this.roomCode(), true)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.showCards.set(true);
+        },
+        error: () => {
+          this.snackbar.open('Error to show cards', undefined, { duration: 3000 });
+        },
       });
-    });
-    this.cardResult.set(resultList);
-    this.roomService.onReveal(this.roomCode(), true).subscribe({
-      next: () => {
-        this.showCards.set(true);
-      },
-      error: () => {
-        this.snackbar.open('Error to show cards', undefined, { duration: 3000 });
-      },
-    });
   }
 
   onSelectCard(card: Card) {
@@ -199,7 +192,7 @@ export class RoomPage implements OnChanges, OnDestroy {
             Object.entries(result).forEach(([key, value]) => {
               resultList.push({
                 value: key,
-                label: value.toString(),
+                label: `(${value} vote${value > 1 ? 's' : ''})`,
               });
             });
             this.cardResult.set(resultList);

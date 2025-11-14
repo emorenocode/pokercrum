@@ -124,11 +124,22 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transform: scale(0.85);
+    gap: 5px;
 
     .result-label {
       font-size: 26px;
       line-height: 27px;
+    }
+
+    .small-card {
+      width: 35px;
+      height: 45px;
+      display: inline-flex;
+      outline: 1px solid;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 18px;
     }
   }
 }
@@ -139,6 +150,13 @@ section {
   align-items: center;
   gap: 50px;
   margin-bottom: 50px;
+
+  .section-title {
+    border-bottom: 1px solid #cecece;
+    width: 50%;
+    text-align: center;
+    padding-bottom: 20px;
+  }
 }
 
 .join-room {

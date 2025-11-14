@@ -46,21 +46,19 @@
   </section>
 
   <section>
-    <h2>Result</h2>
-    <div class="result-list">
-      @if (showCards()) { @for (card of cardResult(); track $index) {
-      <div class="result">
-        <span class="result-label">{{ card.label }}</span>
-        <div class="card disabled flipped">
-          <div class="card__inner">
-            <div class="card__front">🔥</div>
-            <div class="card__back">{{ card.value }}</div>
-          </div>
-        </div>
-      </div>
-      } }
+    @if (showCards()) {
+    <div class="section-title">
+      <h2>Result</h2>
     </div>
-    @if (currentPlayer.room === roomCode()) { @if (showCards()) {
+    <div class="result-list">
+      @for (card of cardResult(); track $index) {
+      <div class="result">
+        <div class="small-card">{{ card.value }}</div>
+        <span>{{ card.label }}</span>
+      </div>
+      }
+    </div>
+    } @if (currentPlayer.room === roomCode()) { @if (showCards()) {
     <button matButton="outlined" (click)="onResetCards()">Reset</button>
     } @else {
     <button matButton="outlined" (click)="onShowCards()">Reveal</button>
