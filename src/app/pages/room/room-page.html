@@ -59,9 +59,9 @@
       }
     </div>
     } @if (currentPlayer.room === roomCode()) { @if (showCards()) {
-    <button matButton="outlined" (click)="onResetCards()">Reset</button>
+    <button matButton="elevated" (click)="onResetCards()">Reset</button>
     } @else {
-    <button matButton="outlined" (click)="onShowCards()">Reveal</button>
+    <button matButton="elevated" (click)="onShowCards()">Reveal</button>
     } }
   </section>
   } @else {
