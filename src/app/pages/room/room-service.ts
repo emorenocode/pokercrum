@@ -115,7 +115,22 @@ export class RoomService {
   }
 
   onReveal(roomCode: string, show: boolean) {
-    return from(updateDoc(doc(this.firestore, 'rooms', roomCode), { show, updatedAt: new Date() }));
+    const roomRef = doc(this.firestore, 'rooms', roomCode);
+    const roomToUpdate = this.currentRoom()
+      ? { ...this.currentRoom(), show, updatedAt: new Date() }
+      : {
+          show,
+          name: '',
+          id: roomCode,
+          createdBy: this.currentPlayer().id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+    const promise: Promise<void> = this.currentRoom()
+      ? updateDoc(roomRef, roomToUpdate)
+      : setDoc(roomRef, roomToUpdate);
+
+    return from(promise);
   }
 
   getReveal(roomCode: string) {
