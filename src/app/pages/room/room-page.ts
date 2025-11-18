@@ -15,6 +15,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
 import { Subject, take, takeUntil } from 'rxjs';
+import { Title } from '@angular/platform-browser';
 
 export interface Card {
   value: string;
@@ -45,6 +46,7 @@ export function countCards(list: Player[]): Record<string, number> {
   styleUrl: './room-page.css',
 })
 export class RoomPage implements OnChanges, OnDestroy {
+  private readonly metaTitle = inject(Title);
   private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
@@ -97,6 +99,7 @@ export class RoomPage implements OnChanges, OnDestroy {
       next: (doc) => {
         if (doc.exists()) {
           this.roomService.currentRoom.set(doc.data());
+          this.metaTitle.setTitle(`PokerCrum Room ${this.currentRoom()?.id}`);
         }
       },
     });
