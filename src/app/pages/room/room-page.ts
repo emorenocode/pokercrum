@@ -17,6 +17,11 @@ import { Header } from '@/app/shared/components/header/header';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 
+interface Result {
+  label: string;
+  card: string;
+  vote: number;
+}
 export interface Card {
   value: string;
   label: string;
@@ -71,7 +76,7 @@ export class RoomPage implements OnChanges, OnDestroy {
   ]);
   public readonly players = signal<Player[]>([]);
   public readonly cardSelected = signal<Card | undefined>(undefined);
-  public readonly cardResult = signal<Card[]>([]);
+  public readonly resultList = signal<Result[]>([]);
   public readonly player = this.roomService.currentPlayer;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl();
@@ -190,15 +195,16 @@ export class RoomPage implements OnChanges, OnDestroy {
         next: (res) => {
           if (res) {
             const result = countCards(this.players());
-            const resultList: Card[] = [];
+            const resultList: Result[] = [];
 
             Object.entries(result).forEach(([key, value]) => {
               resultList.push({
-                value: key,
-                label: `(${value} vote${value > 1 ? 's' : ''})`,
+                vote: value,
+                card: key,
+                label: `( ${value} vote${value > 1 ? 's' : ''} )`,
               });
             });
-            this.cardResult.set(resultList);
+            this.resultList.set(resultList.sort((a, b) => a.vote - b.vote));
           } else {
             if (!this.isInitialLoad()) {
               this.cardSelected.set(undefined);
