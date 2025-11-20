@@ -26,7 +26,7 @@
   </section>
 
   <section class="participants">
-    <h2>Players</h2>
+    <h2>Players {{ players().length > 0 ? ' (' + players().length + ') ' : '' }}</h2>
     <div class="user-list">
       @for (player of players(); track $index) {
       <div class="user">
