@@ -8,18 +8,13 @@
     <div class="card-list">
       @for (card of cards(); track $index) {
       <button
-        class="card flipped"
+        class="card"
         [class.selected]="card.value === cardSelected()?.value"
         [class.disabled]="showCards()"
         (click)="onSelectCard(card)"
         matTooltip="{{ card.label }}"
       >
-        <div class="card__inner">
-          <div class="card__front">🔥</div>
-          <div class="card__back">
-            {{ card.value }}
-          </div>
-        </div>
+        {{ card.value }}
       </button>
       }
     </div>
@@ -66,11 +61,15 @@
   </section>
   } @else {
   <div class="join-room">
-    <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
-    <button (click)="onJoinRoom()">Join Room</button>
-    @if (username.touched && username.invalid) {
-    <div>username is required</div>
-    }
+    <div class="input-btn">
+      <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
+      <button (click)="onJoinRoom()">Join Room</button>
+    </div>
+    <div style="height: 19px">
+      @if (username.touched && username.invalid) {
+      <span>username is required</span>
+      }
+    </div>
   </div>
   }
 </main>

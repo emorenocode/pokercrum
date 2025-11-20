@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 15px;
-  border-bottom: 1px solid #cecece;
+  box-shadow: 0 0 7px 0px rgba(0, 0, 0, 0.5);
 
   .logo {
     font-size: 16px;
@@ -25,6 +25,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    background-color: #fff;
   }
 }
 

@@ -9,7 +9,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { RoomService } from './room-service';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -79,7 +79,7 @@ export class RoomPage implements OnChanges, OnDestroy {
   public readonly resultList = signal<Result[]>([]);
   public readonly player = this.roomService.currentPlayer;
   public readonly roomCode = input.required<string>();
-  public readonly username = new FormControl();
+  public readonly username = new FormControl(null, Validators.required);
   public result!: Record<string, number>;
   public readonly currentRoom = computed<any>(() => this.roomService.currentRoom());
 
