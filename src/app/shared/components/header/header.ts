@@ -23,7 +23,7 @@ export class Header {
   public readonly currentUrl = location.href;
   public readonly player = this.roomService.currentPlayer;
   public readonly username = computed(() => {
-    const username = this.player().username.toUpperCase().split(' ');
+    const username = this.player().username.trim().toUpperCase().split(' ');
     let letters = username[0].slice(0, 2);
 
     if (username.length >= 2) {
