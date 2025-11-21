@@ -31,7 +31,7 @@
             <div class="card__back">{{ player.card?.value }}</div>
           </div>
           @if (currentPlayer.room === roomCode()) {
-          <button title="Delete Player" (click)="onDeletePlayer(player.id)">x</button>
+          <button title="Delete Player" (click)="onDeletePlayer(player.id)">×</button>
           }
         </div>
         <span>{{ player.username }}</span>
