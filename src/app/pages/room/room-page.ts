@@ -111,7 +111,10 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.roomService.currentRoom.set(doc.data());
           this.metaTitle.setTitle(`PokerCrum Room ${this.currentRoom()?.id}`);
         } else {
-          this.router.navigate(['/']);
+          if (this.roomCode() !== this.player().room) {
+            this.router.navigate(['/']);
+            this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, { duration: 3000 });
+          }
         }
         this.isLoadingRoom.set(false);
       },
