@@ -1,8 +1,11 @@
 @let currentPlayer = player();
 <app-header />
-
 <main>
-  @if (currentPlayer.username != '') {
+  @if (isLoadingRoom()) {
+  <div class="spinner-container">
+    <mat-spinner />
+  </div>
+  }@else { @if (currentPlayer.username != '') {
   <section class="card-list-container">
     <h2>Cards</h2>
     <div class="card-list">
@@ -71,5 +74,5 @@
       }
     </div>
   </div>
-  }
+  } }
 </main>

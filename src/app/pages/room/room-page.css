@@ -197,8 +197,23 @@ section {
   padding: 10px;
 }
 
+.input-btn {
+  display: flex;
+  padding: 5px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  height: 600px;
+  align-items: center;
+}
+
 @media (max-width: 425px) {
   .join-room {
+    flex-direction: column;
+  }
+  .input-btn {
     flex-direction: column;
   }
 }

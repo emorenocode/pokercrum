@@ -16,6 +16,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 interface Result {
   label: string;
@@ -46,7 +48,7 @@ export function countCards(list: Player[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [ReactiveFormsModule, MatButton, MatTooltipModule, Header],
+  imports: [ReactiveFormsModule, MatButton, MatTooltipModule, Header, MatProgressSpinner],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
@@ -56,7 +58,9 @@ export class RoomPage implements OnChanges, OnDestroy {
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
   private readonly isInitialLoad = signal(true);
+  private readonly router = inject(Router);
 
+  public readonly isLoadingRoom = signal(true);
   public readonly showCards = signal(false);
   public readonly cards = signal<Card[]>([
     { value: '0', label: 'No effort (already done or trivial)' },
@@ -80,8 +84,8 @@ export class RoomPage implements OnChanges, OnDestroy {
   public readonly player = this.roomService.currentPlayer;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl(null, Validators.required);
-  public result!: Record<string, number>;
   public readonly currentRoom = computed<any>(() => this.roomService.currentRoom());
+  public result!: Record<string, number>;
 
   constructor() {}
 
@@ -100,12 +104,16 @@ export class RoomPage implements OnChanges, OnDestroy {
   }
 
   getRoom() {
+    this.isLoadingRoom.set(true);
     this.roomService.getRoom(this.roomCode()).subscribe({
       next: (doc) => {
         if (doc.exists()) {
           this.roomService.currentRoom.set(doc.data());
           this.metaTitle.setTitle(`PokerCrum Room ${this.currentRoom()?.id}`);
+        } else {
+          this.router.navigate(['/']);
         }
+        this.isLoadingRoom.set(false);
       },
     });
   }
