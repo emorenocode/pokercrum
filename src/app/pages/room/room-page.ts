@@ -96,6 +96,7 @@ export class RoomPage implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['roomCode']) {
+      this.cardSelected.set(undefined);
       this.showCards.set(false);
       this.resultList.set([]);
       this.onDestroy$.next();
