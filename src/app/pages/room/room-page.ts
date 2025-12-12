@@ -109,7 +109,8 @@ export class RoomPage implements OnChanges, OnDestroy {
       next: (doc) => {
         if (doc.exists()) {
           this.roomService.currentRoom.set(doc.data());
-          this.metaTitle.setTitle(`PokerCrum Room ${this.currentRoom()?.id}`);
+          const roomOwner = this.players().find((player) => player.room === this.roomCode());
+          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
         } else {
           if (this.roomCode() !== this.player().room) {
             this.router.navigate(['/']);
