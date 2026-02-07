@@ -37,13 +37,16 @@ export interface Player {
 }
 
 export function countCards(list: Player[]): Record<string, number> {
-  return list.reduce((acc, item) => {
-    if (item.card?.value == null) return acc;
+  return list.reduce(
+    (acc, item) => {
+      if (item.card?.value == null) return acc;
 
-    const key = String(item.card?.value);
-    acc[key] = (acc[key] ?? 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+      const key = String(item.card?.value);
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 }
 
 @Component({
@@ -110,10 +113,14 @@ export class RoomPage implements OnChanges, OnDestroy {
     this.isLoadingRoom.set(true);
     this.roomService.getRoom(this.roomCode()).subscribe({
       next: (doc) => {
+        const roomOwner =
+          this.player().room === this.roomCode()
+            ? this.player()
+            : this.players().find((player) => player.room === this.roomCode());
+        this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
+
         if (doc.exists()) {
           this.roomService.currentRoom.set(doc.data());
-          const roomOwner = this.players().find((player) => player.room === this.roomCode());
-          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
         } else {
           if (this.roomCode() !== this.player().room) {
             this.router.navigate(['/']);
