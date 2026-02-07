@@ -2,77 +2,87 @@
 <app-header />
 <main>
   @if (isLoadingRoom()) {
-  <div class="spinner-container">
-    <mat-spinner />
-  </div>
-  }@else { @if (currentPlayer.username != '') {
-  <section class="card-list-container">
-    <h2>Cards</h2>
-    <div class="card-list">
-      @for (card of cards(); track $index) {
-      <button
-        class="card"
-        [class.selected]="card.value === cardSelected()?.value"
-        [class.disabled]="showCards()"
-        (click)="onSelectCard(card)"
-        matTooltip="{{ card.label }}"
-      >
-        {{ card.value }}
-      </button>
-      }
+    <div class="spinner-container">
+      <mat-spinner />
     </div>
-  </section>
-
-  <section class="participants">
-    <h2>Players {{ players().length > 0 ? ' (' + players().length + ') ' : '' }}</h2>
-    <div class="user-list">
-      @for (player of players(); track $index) {
-      <div class="user">
-        <div class="card disabled" [class.flipped]="showCards()">
-          <div class="card__inner">
-            <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
-            <div class="card__back">{{ player.card?.value }}</div>
-          </div>
-          @if (currentPlayer.room === roomCode()) {
-          <button title="Delete Player" (click)="onDeletePlayer(player.id)">×</button>
+  } @else {
+    @if (currentPlayer.username != '') {
+      <section class="card-list-container">
+        <h2>Cards</h2>
+        <div class="card-list">
+          @for (card of cards(); track $index) {
+            <button
+              class="card"
+              [class.selected]="card.value === cardSelected()?.value"
+              [class.disabled]="showCards()"
+              (click)="onSelectCard(card)"
+              matTooltip="{{ card.label }}"
+            >
+              {{ card.value }}
+            </button>
           }
         </div>
-        <span>{{ player.username }}</span>
-      </div>
-      }
-    </div>
-  </section>
+      </section>
 
-  <section>
-    @if (showCards()) {
-    <div class="section-title">
-      <h2>Result</h2>
-    </div>
-    <div class="result-list">
-      @for (result of resultList(); track $index) {
-      <div class="result">
-        <div class="small-card">{{ result.card }}</div>
-        <span>{{ result.label }}</span>
-      </div>
-      }
-    </div>
-    } @if (currentPlayer.room === roomCode()) { @if (showCards()) {
-    <button matButton="elevated" (click)="onResetCards()">Reset</button>
+      <section class="participants">
+        <h2>Players {{ players().length > 0 ? ' (' + players().length + ')' : '' }}</h2>
+        <div class="user-list">
+          @for (player of players(); track $index) {
+            <div class="user">
+              <div class="card disabled" [class.flipped]="showCards()">
+                <div class="card__inner">
+                  <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
+                  <div class="card__back">{{ showCards() ? player.card?.value : '' }}</div>
+                </div>
+                @if (currentPlayer.room === roomCode()) {
+                  <button title="Delete Player" (click)="onDeletePlayer(player.id)">×</button>
+                }
+              </div>
+              <span>{{ player.username }}</span>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section>
+        @if (showCards()) {
+          <div class="section-title">
+            <h2>Result</h2>
+          </div>
+          <div class="result-list">
+            @for (result of resultList(); track $index) {
+              <div class="result">
+                <div class="small-card">{{ result.card }}</div>
+                <span>{{ result.label }}</span>
+              </div>
+            }
+          </div>
+        }
+        @if (currentPlayer.room === roomCode()) {
+          @if (showCards()) {
+            <button matButton="elevated" (click)="onResetCards()">Reset</button>
+          } @else {
+            <button matButton="elevated" (click)="onShowCards()">Reveal</button>
+          }
+        }
+      </section>
     } @else {
-    <button matButton="elevated" (click)="onShowCards()">Reveal</button>
-    } }
-  </section>
-  } @else {
-  <div class="join-room">
-    <div class="input-btn">
-      <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
-      <button (click)="onJoinRoom()">Join Room</button>
-    </div>
-    <div style="height: 19px">
-      @if (username.touched && username.invalid) {
-      <span>username is required</span>
-      }
-    </div>
-  </div>
-  } }
+      <div class="join-room">
+        <div class="input-btn">
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter Username"
+            [formControl]="username"
+          />
+          <button (click)="onJoinRoom()">Join Room</button>
+        </div>
+        <div style="height: 19px">
+          @if (username.touched && username.invalid) {
+            <span>username is required</span>
+          }
+        </div>
+      </div>
+    }
+  }
 </main>
