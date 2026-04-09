@@ -27,7 +27,7 @@
       <section class="participants">
         <h2 class="title">
           Players {{ players().length > 0 ? ' (' + players().length + ')' : '' }}
-          @if (players().length > 0) {
+          @if (players().length > 0 && currentPlayer.room === roomCode()) {
             <button matIconButton title="Delete all" (click)="onClearAll()">
               <mat-icon>delete_forever</mat-icon>
             </button>
