@@ -209,6 +209,18 @@ section {
   align-items: center;
 }
 
+.participants {
+  .title {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    button {
+      color: #e90e0e;
+    }
+  }
+}
+
 @media (max-width: 425px) {
   .join-room {
     flex-direction: column;

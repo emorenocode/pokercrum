@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
@@ -18,6 +18,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 
 interface Result {
   label: string;
@@ -51,7 +52,14 @@ export function countCards(list: Player[]): Record<string, number> {
 
 @Component({
   selector: 'app-room',
-  imports: [ReactiveFormsModule, MatButton, MatTooltipModule, Header, MatProgressSpinner],
+  imports: [
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatTooltipModule,
+    Header,
+    MatProgressSpinner,
+    MatIconModule,
+  ],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
@@ -242,6 +250,12 @@ export class RoomPage implements OnChanges, OnDestroy {
       error: () => {
         this.snackbar.open('Error to delete player', undefined, { duration: 3000 });
       },
+    });
+  }
+
+  onClearAll() {
+    this.players().forEach((player) => {
+      this.onDeletePlayer(player.id);
     });
   }
 }
