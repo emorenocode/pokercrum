@@ -80,7 +80,7 @@ export class RoomService {
       'rooms',
       this.newRoom,
       'players',
-      this.currentPlayer().id
+      this.currentPlayer().id,
     );
     batch.set(playerRef, this.currentPlayer());
 
@@ -88,7 +88,7 @@ export class RoomService {
       map(() => {
         this.saveLocalData(this.currentPlayer());
         return this.newRoom;
-      })
+      }),
     );
   }
 
@@ -106,7 +106,7 @@ export class RoomService {
       map(() => player),
       tap(() => {
         this.saveLocalData(player);
-      })
+      }),
     );
   }
 
@@ -134,11 +134,11 @@ export class RoomService {
   }
 
   getReveal(roomCode: string) {
-    const observer = new Subject<boolean>();
+    const observer = new Subject<any>();
 
     const unsubscribe = onSnapshot(doc(this.firestore, 'rooms', roomCode), (doc) => {
       if (doc.exists()) {
-        observer.next(doc.data()['show']);
+        observer.next(doc.data());
       }
     });
 
@@ -154,7 +154,11 @@ export class RoomService {
     });
 
     const showRef = doc(this.firestore, 'rooms', roomCode);
-    batch.update(showRef, { show: false, updatedAt: new Date() });
+    batch.update(showRef, {
+      show: true,
+      updatedAt: new Date(),
+      timerEnd: new Date().getTime() + (this.currentRoom()?.timer ?? 30) * 1000,
+    });
 
     return from(batch.commit());
   }

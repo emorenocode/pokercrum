@@ -65,11 +65,14 @@
             }
           </div>
         }
+        @if (showCountdown() && !showCards()) {
+          <app-countdown [timerEnd]="timerEnd()" (stop)="onShowCards()" />
+        }
         @if (currentPlayer.room === roomCode()) {
           @if (showCards()) {
             <button matButton="elevated" (click)="onResetCards()">Reset</button>
           } @else {
-            <button matButton="elevated" (click)="onShowCards()">Reveal</button>
+            <button matButton="elevated" (click)="onReveal()">Reveal</button>
           }
         }
       </section>

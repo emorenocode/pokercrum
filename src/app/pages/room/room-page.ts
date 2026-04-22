@@ -19,6 +19,7 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { Countdown } from '@/app/shared/components/countdown/countdown';
 
 interface Result {
   label: string;
@@ -59,6 +60,7 @@ export function countCards(list: Player[]): Record<string, number> {
     Header,
     MatProgressSpinner,
     MatIconModule,
+    Countdown,
   ],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
@@ -97,6 +99,8 @@ export class RoomPage implements OnChanges, OnDestroy {
   public readonly username = new FormControl(null, Validators.required);
   public readonly currentRoom = computed<any>(() => this.roomService.currentRoom());
   public result!: Record<string, number>;
+  public readonly showCountdown = signal(false);
+  public readonly timerEnd = signal(0);
 
   constructor() {}
 
@@ -129,6 +133,7 @@ export class RoomPage implements OnChanges, OnDestroy {
 
         if (doc.exists()) {
           this.roomService.currentRoom.set(doc.data());
+          this.timerEnd.set(doc.data()['timerEnd'] ?? 0);
         } else {
           if (this.roomCode() !== this.player().room) {
             this.router.navigate(['/']);
@@ -180,17 +185,19 @@ export class RoomPage implements OnChanges, OnDestroy {
   }
 
   onShowCards() {
-    this.roomService
-      .onReveal(this.roomCode(), true)
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          this.showCards.set(true);
-        },
-        error: () => {
-          this.snackbar.open('Error to show cards', undefined, { duration: 3000 });
-        },
+    const result = countCards(this.players());
+    const resultList: Result[] = [];
+
+    Object.entries(result).forEach(([key, value]) => {
+      resultList.push({
+        vote: value,
+        card: key,
+        label: `( ${value} vote${value > 1 ? 's' : ''} )`,
       });
+    });
+    this.resultList.set(resultList.sort((a, b) => a.vote - b.vote));
+    this.showCards.set(true);
+    this.showCountdown.set(false);
   }
 
   onSelectCard(card: Card) {
@@ -208,11 +215,16 @@ export class RoomPage implements OnChanges, OnDestroy {
 
   onResetCards() {
     this.roomService.onResetCards(this.roomCode(), this.players()).subscribe({
-      next: () => {
-        this.showCards.set(false);
-      },
       error: () => {
         this.snackbar.open('Error to reset cards', undefined, { duration: 3000 });
+      },
+    });
+  }
+
+  onReveal() {
+    this.roomService.onReveal(this.roomCode(), true).subscribe({
+      error: () => {
+        this.snackbar.open('Error to reveal cards', undefined, { duration: 3000 });
       },
     });
   }
@@ -223,24 +235,30 @@ export class RoomPage implements OnChanges, OnDestroy {
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
         next: (res) => {
-          if (res) {
-            const result = countCards(this.players());
-            const resultList: Result[] = [];
+          const reveal = res['show'] as boolean;
 
-            Object.entries(result).forEach(([key, value]) => {
-              resultList.push({
-                vote: value,
-                card: key,
-                label: `( ${value} vote${value > 1 ? 's' : ''} )`,
-              });
-            });
-            this.resultList.set(resultList.sort((a, b) => a.vote - b.vote));
-          } else {
-            if (!this.isInitialLoad()) {
-              this.cardSelected.set(undefined);
-            }
+          this.timerEnd.set(res['timerEnd'] ?? 0);
+
+          if (this.isInitialLoad() && reveal) {
+            this.showCountdown.set(true);
+            this.isInitialLoad.set(false);
+            return;
           }
-          this.showCards.set(res);
+
+          if (this.isInitialLoad()) {
+            this.onShowCards();
+            this.isInitialLoad.set(false);
+            return;
+          }
+
+          if (this.showCountdown() === reveal) {
+            this.showCountdown.set(false);
+            this.onShowCards();
+            return;
+          }
+
+          this.showCountdown.set(reveal);
+          this.showCards.set(!reveal);
         },
       });
   }
