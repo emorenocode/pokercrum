@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { finalize, from, map, Subject, tap } from 'rxjs';
-import { Player } from './room-page';
+import { Player, Room } from '@/app/core/models';
 import { nanoid } from 'nanoid';
 import {
   collection,
@@ -26,7 +26,7 @@ export class RoomService {
     id: nanoid(),
   });
 
-  public readonly currentRoom = signal<any>('');
+  public readonly currentRoom = signal<Room | undefined>(undefined);
 
   constructor() {
     this.checkPlayer();
@@ -170,5 +170,14 @@ export class RoomService {
   updatePlayer(updatedPlayer: Player) {
     this.saveLocalData(updatedPlayer);
     this.checkPlayer();
+  }
+
+  updateRoom(updatedRoom: Room) {
+    const roomRef = doc(this.firestore, 'rooms', updatedRoom.id);
+    return from(updateDoc(roomRef, { ...updatedRoom, updatedAt: new Date() })).pipe(
+      tap(() => {
+        this.currentRoom.set(updatedRoom);
+      }),
+    );
   }
 }

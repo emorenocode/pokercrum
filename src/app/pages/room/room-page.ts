@@ -20,23 +20,7 @@ import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { Countdown } from '@/app/shared/components/countdown/countdown';
-
-interface Result {
-  label: string;
-  card: string;
-  vote: number;
-}
-export interface Card {
-  value: string;
-  label: string;
-}
-
-export interface Player {
-  id: string;
-  username: string;
-  card?: Card;
-  room?: string;
-}
+import { Card, Player, Result, Room } from '@/app/core/models';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -137,7 +121,7 @@ export class RoomPage implements OnChanges, OnDestroy {
             return throwError(() => new Error('Room not found'));
           }
 
-          this.roomService.currentRoom.set(doc.data());
+          this.roomService.currentRoom.set(doc.data() as unknown as Room);
           this.timerEnd.set(doc.data()?.['timerEnd'] ?? 0);
           return this.roomService.joinRoom(this.player(), this.roomCode());
         }),

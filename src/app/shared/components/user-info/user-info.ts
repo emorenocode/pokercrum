@@ -1,12 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { RoomService } from '@/app/pages/room/room-service';
-import { Player } from '@/app/pages/room/room-page';
+import { Player } from '@/app/core/models';
 import { Router } from '@angular/router';
 import { OverlayContent } from '@/app/core/services/overlay-content';
+import { RoomSettings } from '../room-settings/room-settings';
 
 @Component({
   selector: 'app-user-info',
-  imports: [],
+  imports: [RoomSettings],
   templateUrl: './user-info.html',
   styleUrl: './user-info.css',
 })
