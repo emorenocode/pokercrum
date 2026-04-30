@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
-import { Subject, take, takeUntil } from 'rxjs';
+import { Subject, switchMap, takeUntil, throwError } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -123,26 +123,36 @@ export class RoomPage implements OnChanges, OnDestroy {
 
   getRoom() {
     this.isLoadingRoom.set(true);
-    this.roomService.getRoom(this.roomCode()).subscribe({
-      next: (doc) => {
-        const roomOwner =
-          this.player().room === this.roomCode()
-            ? this.player()
-            : this.players().find((player) => player.room === this.roomCode());
-        this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
+    this.roomService
+      .getRoom(this.roomCode())
+      .pipe(
+        switchMap((doc) => {
+          const roomOwner =
+            this.player().room === this.roomCode()
+              ? this.player()
+              : this.players().find((player) => player.room === this.roomCode());
+          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
 
-        if (doc.exists()) {
-          this.roomService.currentRoom.set(doc.data());
-          this.timerEnd.set(doc.data()['timerEnd'] ?? 0);
-        } else {
-          if (this.roomCode() !== this.player().room) {
-            this.router.navigate(['/']);
-            this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, { duration: 3000 });
+          if (!doc.exists() && this.roomCode() !== this.player().room) {
+            return throwError(() => new Error('Room not found'));
           }
-        }
-        this.isLoadingRoom.set(false);
-      },
-    });
+
+          this.roomService.currentRoom.set(doc.data());
+          this.timerEnd.set(doc.data()?.['timerEnd'] ?? 0);
+          return this.roomService.joinRoom(this.player(), this.roomCode());
+        }),
+      )
+      .subscribe({
+        next: (doc) => {
+          this.isLoadingRoom.set(false);
+        },
+        error: () => {
+          this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
+            duration: 3000,
+          });
+          this.router.navigate(['/']);
+        },
+      });
   }
 
   getPlayers() {
