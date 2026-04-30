@@ -41,7 +41,7 @@
                   <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
                   <div class="card__back">{{ showCards() ? player.card?.value : '' }}</div>
                 </div>
-                @if (currentPlayer.room === roomCode()) {
+                @if (currentPlayer.room === roomCode() && currentPlayer.id !== player.id) {
                   <button title="Delete Player" (click)="onDeletePlayer(player.id)">×</button>
                 }
               </div>

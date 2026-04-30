@@ -273,6 +273,7 @@ export class RoomPage implements OnChanges, OnDestroy {
 
   onClearAll() {
     this.players().forEach((player) => {
+      if (this.player().id === player.id) return;
       this.onDeletePlayer(player.id);
     });
   }
