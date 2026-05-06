@@ -111,18 +111,21 @@ export class RoomPage implements OnChanges, OnDestroy {
       .getRoom(this.roomCode())
       .pipe(
         switchMap((doc) => {
-          const roomOwner =
-            this.player().room === this.roomCode()
-              ? this.player()
-              : this.players().find((player) => player.room === this.roomCode());
-          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
-
           if (!doc.exists() && this.roomCode() !== this.player().room) {
             return throwError(() => new Error('Room not found'));
           }
 
-          this.roomService.currentRoom.set(doc.data() as unknown as Room);
-          this.timerEnd.set(doc.data()?.['timerEnd'] ?? 0);
+          const room = doc.data() as Room | undefined;
+          const roomOwner =
+            this.player().room === this.roomCode()
+              ? this.player()
+              : this.players().find(
+                  (player) => player.room === this.roomCode() || room?.createdBy === player.id,
+                );
+
+          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
+          this.roomService.currentRoom.set(room);
+          this.timerEnd.set(room?.timerEnd ?? 0);
           return this.roomService.joinRoom(this.player(), this.roomCode());
         }),
       )
