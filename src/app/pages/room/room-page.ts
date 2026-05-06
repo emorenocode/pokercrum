@@ -128,8 +128,8 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.timerEnd.set(room?.timerEnd ?? 0);
 
           const playerInRoom = {
-            ...this.players().find((p) => p.id === this.player().id),
             ...this.player(),
+            ...this.players().find((p) => p.id === this.player().id),
           } as Player;
 
           if (playerInRoom) {

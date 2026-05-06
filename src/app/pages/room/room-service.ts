@@ -44,7 +44,9 @@ export class RoomService {
 
     try {
       const playerDecoded = atob(playerStored);
-      player = JSON.parse(playerDecoded);
+      const playerToBytes = Uint8Array.from(playerDecoded, (char) => char.charCodeAt(0));
+      const playerToString = new TextDecoder().decode(playerToBytes);
+      player = JSON.parse(playerToString);
     } catch (error) {
       try {
         player = JSON.parse(playerStored);
@@ -93,8 +95,17 @@ export class RoomService {
   }
 
   private saveLocalData(player: Player) {
-    const data = btoa(JSON.stringify(player));
-    localStorage.setItem('pcUser', data);
+    try {
+      const playerToString = JSON.stringify(player);
+      const playerToBytes = new TextEncoder().encode(playerToString);
+      const playerToBinString = Array.from(playerToBytes, (byte) => String.fromCharCode(byte)).join(
+        '',
+      );
+      const data = btoa(playerToBinString);
+      localStorage.setItem('pcUser', data);
+    } catch (error) {
+      console.error('Error saving player data to localStorage:', error);
+    }
   }
 
   getPlayers(roomCode: string) {
