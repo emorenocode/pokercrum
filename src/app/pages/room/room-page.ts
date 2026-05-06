@@ -126,7 +126,17 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
           this.roomService.currentRoom.set(room);
           this.timerEnd.set(room?.timerEnd ?? 0);
-          return this.roomService.joinRoom(this.player(), this.roomCode());
+
+          const playerInRoom = {
+            ...this.players().find((p) => p.id === this.player().id),
+            ...this.player(),
+          } as Player;
+
+          if (playerInRoom) {
+            this.cardSelected.set(playerInRoom.card);
+          }
+
+          return this.roomService.joinRoom(playerInRoom, this.roomCode());
         }),
       )
       .subscribe({
