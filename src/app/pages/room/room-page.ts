@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
-import { Subject, switchMap, takeUntil, throwError } from 'rxjs';
+import { EMPTY, finalize, Subject, switchMap, takeUntil, throwError } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -136,13 +136,15 @@ export class RoomPage implements OnChanges, OnDestroy {
             this.cardSelected.set(playerInRoom.card);
           }
 
+          if (!playerInRoom.username) {
+            return EMPTY;
+          }
+
           return this.roomService.joinRoom(playerInRoom, this.roomCode());
         }),
+        finalize(() => this.isLoadingRoom.set(false)),
       )
       .subscribe({
-        next: (doc) => {
-          this.isLoadingRoom.set(false);
-        },
         error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
             duration: 3000,
