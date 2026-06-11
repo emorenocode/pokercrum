@@ -7,6 +7,7 @@ import {
   collectionData,
   deleteDoc,
   doc,
+  docData,
   Firestore,
   getDoc,
   onSnapshot,
@@ -156,6 +157,10 @@ export class RoomService {
     return observer.asObservable().pipe(finalize(() => unsubscribe()));
   }
 
+  onListenerRoom(roomCode: string) {
+    return docData(doc(this.firestore, 'rooms', roomCode));
+  }
+
   onResetCards(roomCode: string, players: Player[]) {
     const batch = writeBatch(this.firestore);
     players.forEach((player) => {
@@ -166,7 +171,7 @@ export class RoomService {
 
     const showRef = doc(this.firestore, 'rooms', roomCode);
     batch.update(showRef, {
-      show: true,
+      show: false,
       updatedAt: new Date(),
       timerEnd: new Date().getTime() + (this.currentRoom()?.timer ?? 30) * 1000,
     });
