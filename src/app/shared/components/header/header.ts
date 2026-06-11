@@ -20,7 +20,7 @@ export class Header {
   private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
   private readonly roomService = inject(RoomService);
-  public readonly currentUrl = location.href;
+  protected currentUrl = location.href;
   public readonly player = this.roomService.currentPlayer;
   public readonly username = computed(() => {
     const username = this.player().username.trim().toUpperCase().split(' ');
@@ -40,6 +40,7 @@ export class Header {
   }
 
   openToShared(origin: HTMLElement, template: TemplateRef<any>) {
+    this.currentUrl = location.href;
     this.overlayContent.open(origin, template, this.currentUrl, this.viewContainerRef);
   }
 

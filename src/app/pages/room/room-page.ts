@@ -199,6 +199,7 @@ export class RoomPage implements OnChanges, OnDestroy {
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
         next: (qs) => {
+          console.log('Players: ', qs);
           this.players.set(qs as unknown as Player[]);
           this.players().forEach((player) => {
             if (player.id === this.player().id) {
