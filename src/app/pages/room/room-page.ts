@@ -141,6 +141,9 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.showCountdown.set(!roomData.show);
           this.showCards.set(roomData.show);
           this.isLoadingRoom.set(false);
+          if (roomData.show) {
+            this.onShowCards();
+          }
         },
         error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
