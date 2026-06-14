@@ -57,6 +57,11 @@ export class RoomPage implements OnChanges, OnDestroy {
   private readonly isInitialLoad = signal(true);
   private readonly router = inject(Router);
 
+  protected readonly isOwner = computed(() => {
+    const room = this.roomService.currentRoom();
+    return room?.createdBy === this.player().id;
+  });
+
   public readonly isLoadingRoom = signal(true);
   public readonly showCards = signal(false);
   public readonly cards = signal<Card[]>([
@@ -107,40 +112,43 @@ export class RoomPage implements OnChanges, OnDestroy {
   }
 
   onListenerRoom() {
-    this.roomService.onListenerRoom(this.roomCode()).subscribe({
-      next: (room) => {
-        console.log('Room: ', room);
+    this.roomService
+      .onListenerRoom(this.roomCode())
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe({
+        next: (room) => {
+          console.log('Room: ', room);
 
-        if (!room) {
+          if (!room) {
+            this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
+              duration: 3000,
+            });
+            this.router.navigate(['/']);
+            return;
+          }
+
+          const roomData = room as Room;
+          const roomOwner =
+            this.player().room === this.roomCode()
+              ? this.player()
+              : this.players().find(
+                  (player) => player.room === this.roomCode() || roomData.createdBy === player.id,
+                );
+
+          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
+          this.roomService.currentRoom.set(roomData);
+          this.timerEnd.set(roomData.timerEnd);
+          this.showCountdown.set(!roomData.show);
+          this.showCards.set(roomData.show);
+          this.isLoadingRoom.set(false);
+        },
+        error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
             duration: 3000,
           });
           this.router.navigate(['/']);
-          return;
-        }
-
-        const roomData = room as Room;
-        const roomOwner =
-          this.player().room === this.roomCode()
-            ? this.player()
-            : this.players().find(
-                (player) => player.room === this.roomCode() || roomData.createdBy === player.id,
-              );
-
-        this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
-        this.roomService.currentRoom.set(roomData);
-        this.timerEnd.set(roomData.timerEnd);
-        this.showCountdown.set(!roomData.show);
-        this.showCards.set(roomData.show);
-        this.isLoadingRoom.set(false);
-      },
-      error: () => {
-        this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
-          duration: 3000,
-        });
-        this.router.navigate(['/']);
-      },
-    });
+        },
+      });
   }
 
   getRoom() {

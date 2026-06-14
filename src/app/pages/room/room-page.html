@@ -27,7 +27,7 @@
       <section class="participants">
         <h2 class="title">
           Players {{ players().length > 0 ? ' (' + players().length + ')' : '' }}
-          @if (players().length > 0 && currentPlayer.room === roomCode()) {
+          @if (players().length > 0 && isOwner()) {
             <button matIconButton title="Delete all" (click)="onClearAll()">
               <mat-icon>delete_forever</mat-icon>
             </button>
@@ -41,7 +41,7 @@
                   <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
                   <div class="card__back">{{ showCards() ? player.card?.value : '' }}</div>
                 </div>
-                @if (currentPlayer.room === roomCode() && currentPlayer.id !== player.id) {
+                @if (isOwner() && currentPlayer.id !== player.id) {
                   <button title="Delete Player" (click)="onDeletePlayer(player.id)">×</button>
                 }
               </div>
@@ -68,7 +68,7 @@
         @if (showCountdown() && !showCards()) {
           <app-countdown [timerEnd]="timerEnd()" (stop)="onShowCards()" />
         }
-        @if (currentPlayer.room === roomCode()) {
+        @if (isOwner()) {
           @if (showCards()) {
             <button matButton="elevated" (click)="onResetCards()">Reset</button>
           } @else {
