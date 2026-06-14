@@ -1,5 +1,4 @@
 import { Component, computed, inject, TemplateRef, ViewContainerRef } from '@angular/core';
-import { RoomService } from '@/app/pages/room/room-service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -7,6 +6,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { OverlayContent } from '@/app/core/services/overlay-content';
 import { UserInfo } from '../user-info/user-info';
+import { PlayerStore } from '@/app/core/services/player-store';
 
 @Component({
   selector: 'app-header',
@@ -15,13 +15,13 @@ import { UserInfo } from '../user-info/user-info';
   styleUrl: './header.css',
 })
 export class Header {
+  private readonly playerStore = inject(PlayerStore);
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly overlayContent = inject(OverlayContent);
   private readonly snackbar = inject(MatSnackBar);
   private readonly clipboad = inject(Clipboard);
-  private readonly roomService = inject(RoomService);
   protected currentUrl = location.href;
-  public readonly player = this.roomService.currentPlayer;
+  public readonly player = this.playerStore.player;
   public readonly username = computed(() => {
     const username = this.player().username.trim().toUpperCase().split(' ');
     let letters = username[0].slice(0, 2);

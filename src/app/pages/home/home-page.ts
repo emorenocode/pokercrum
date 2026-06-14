@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
+import { PlayerStore } from '@/app/core/services/player-store';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrl: './home-page.css',
 })
 export class HomePage implements OnInit, OnDestroy {
+  private readonly playerStore = inject(PlayerStore);
   private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
@@ -29,7 +31,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   checkMyRooms() {
-    const roomCode = this.roomService.currentPlayer().room;
+    const roomCode = this.playerStore.player().room;
     if (roomCode) {
       this.router.navigate(['/', roomCode]);
     }

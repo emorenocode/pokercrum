@@ -15,49 +15,15 @@ import {
   updateDoc,
   writeBatch,
 } from '@angular/fire/firestore';
+import { PlayerStore } from '@/app/core/services/player-store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoomService {
+  private readonly playerStore = inject(PlayerStore);
   private readonly firestore = inject(Firestore);
-  private readonly _currentPlayer = signal<Player>({
-    username: '',
-    id: nanoid(),
-  });
-
   public readonly currentRoom = signal<Room | undefined>(undefined);
-
-  constructor() {
-    this.checkPlayer();
-  }
-
-  get currentPlayer() {
-    return this._currentPlayer;
-  }
-
-  checkPlayer() {
-    const playerStored = localStorage.getItem('pcUser');
-    let player;
-
-    if (!playerStored) return;
-
-    try {
-      const playerDecoded = atob(playerStored);
-      const playerToBytes = Uint8Array.from(playerDecoded, (char) => char.charCodeAt(0));
-      const playerToString = new TextDecoder().decode(playerToBytes);
-      player = JSON.parse(playerToString);
-    } catch (error) {
-      try {
-        player = JSON.parse(playerStored);
-        this.saveLocalData(player);
-      } catch (error) {}
-    }
-
-    if (!player) return;
-
-    this._currentPlayer.set(player);
-  }
 
   getRoom(roomCode: string) {
     const roomRef = doc(this.firestore, 'rooms', roomCode);
@@ -66,41 +32,28 @@ export class RoomService {
 
   createRoom(username: string) {
     const newRoom = nanoid(6);
-    this._currentPlayer.update((player) => ({ ...player, username, room: newRoom }));
+    const currentPlayer = this.playerStore.player();
+    this.playerStore.player.update((player) => ({ ...player, username, room: newRoom }));
 
     const batch = writeBatch(this.firestore);
     const room = {
       id: newRoom,
       name: '',
-      createdBy: this.currentPlayer().id,
+      createdBy: currentPlayer.id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     const roomRef = doc(this.firestore, 'rooms', newRoom);
     batch.set(roomRef, room);
-    const playerRef = doc(this.firestore, 'rooms', newRoom, 'players', this.currentPlayer().id);
-    batch.set(playerRef, this.currentPlayer());
+    const playerRef = doc(this.firestore, 'rooms', newRoom, 'players', currentPlayer.id);
+    batch.set(playerRef, currentPlayer);
 
     return from(batch.commit()).pipe(
       map(() => {
-        this.saveLocalData(this.currentPlayer());
+        this.playerStore.savePlayer(currentPlayer);
         return newRoom;
       }),
     );
-  }
-
-  private saveLocalData(player: Player) {
-    try {
-      const playerToString = JSON.stringify(player);
-      const playerToBytes = new TextEncoder().encode(playerToString);
-      const playerToBinString = Array.from(playerToBytes, (byte) => String.fromCharCode(byte)).join(
-        '',
-      );
-      const data = btoa(playerToBinString);
-      localStorage.setItem('pcUser', data);
-    } catch (error) {
-      console.error('Error saving player data to localStorage:', error);
-    }
   }
 
   getPlayers(roomCode: string) {
@@ -111,7 +64,7 @@ export class RoomService {
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
       map(() => player),
       tap(() => {
-        this.saveLocalData(player);
+        this.playerStore.savePlayer(player);
       }),
     );
   }
@@ -121,6 +74,7 @@ export class RoomService {
   }
 
   onReveal(roomCode: string, show: boolean) {
+    const currentPlayer = this.playerStore.player();
     const roomRef = doc(this.firestore, 'rooms', roomCode);
     const roomToUpdate = this.currentRoom()
       ? { ...this.currentRoom(), show, updatedAt: new Date() }
@@ -128,7 +82,7 @@ export class RoomService {
           show,
           name: '',
           id: roomCode,
-          createdBy: this.currentPlayer().id,
+          createdBy: currentPlayer.id,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -175,11 +129,6 @@ export class RoomService {
 
   onDeletePlayer(roomCode: string, playerId: string) {
     return from(deleteDoc(doc(this.firestore, 'rooms', roomCode, 'players', playerId)));
-  }
-
-  updatePlayer(updatedPlayer: Player) {
-    this.saveLocalData(updatedPlayer);
-    this.checkPlayer();
   }
 
   updateRoom(updatedRoom: Room) {

@@ -4,6 +4,7 @@ import { Player } from '@/app/core/models';
 import { Router } from '@angular/router';
 import { OverlayContent } from '@/app/core/services/overlay-content';
 import { RoomSettings } from '../room-settings/room-settings';
+import { PlayerStore } from '@/app/core/services/player-store';
 
 @Component({
   selector: 'app-user-info',
@@ -12,10 +13,11 @@ import { RoomSettings } from '../room-settings/room-settings';
   styleUrl: './user-info.css',
 })
 export class UserInfo {
+  private readonly playerStore = inject(PlayerStore);
   private readonly overlayContent = inject(OverlayContent);
   private readonly router = inject(Router);
   private readonly roomService = inject(RoomService);
-  public readonly player = this.roomService.currentPlayer;
+  public readonly player = this.playerStore.player;
   public readonly currentRoom = computed(() => this.roomService.currentRoom());
   username?: string;
   invalidUsername = false;
@@ -37,7 +39,8 @@ export class UserInfo {
   onBlur() {
     if (!this.username || this.username.trim() == '') return;
     const updatedPlayer: Player = { ...this.player(), username: this.username.trim() };
-    this.roomService.updatePlayer(updatedPlayer);
+    this.playerStore.savePlayer(updatedPlayer);
+    this.playerStore.getPlayer();
   }
 
   goToRoom(roomCode?: string) {

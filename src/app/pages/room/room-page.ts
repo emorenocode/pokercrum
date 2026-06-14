@@ -21,6 +21,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { Countdown } from '@/app/shared/components/countdown/countdown';
 import { Card, Player, Result, Room } from '@/app/core/models';
+import { PlayerStore } from '@/app/core/services/player-store';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -56,6 +57,7 @@ export class RoomPage implements OnChanges, OnDestroy {
   private readonly roomService = inject(RoomService);
   private readonly isInitialLoad = signal(true);
   private readonly router = inject(Router);
+  private readonly playerStore = inject(PlayerStore);
 
   protected readonly isOwner = computed(() => {
     const room = this.roomService.currentRoom();
@@ -83,13 +85,13 @@ export class RoomPage implements OnChanges, OnDestroy {
   public readonly players = signal<Player[]>([]);
   public readonly cardSelected = signal<Card | undefined>(undefined);
   public readonly resultList = signal<Result[]>([]);
-  public readonly player = this.roomService.currentPlayer;
+  public readonly player = this.playerStore.player;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl(null, Validators.required);
   public readonly currentRoom = computed<Room | undefined>(() => this.roomService.currentRoom());
-  public result!: Record<string, number>;
   public readonly showCountdown = signal(false);
   public readonly timerEnd = signal(0);
+  public result!: Record<string, number>;
 
   constructor() {}
 
