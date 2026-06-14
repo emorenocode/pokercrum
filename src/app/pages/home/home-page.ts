@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RoomService } from '@/app/pages/room/room-service';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
+  private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
   private readonly router = inject(Router);
@@ -19,6 +21,11 @@ export class HomePage implements OnInit {
 
   ngOnInit(): void {
     this.checkMyRooms();
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   checkMyRooms() {
@@ -40,14 +47,17 @@ export class HomePage implements OnInit {
       return;
     }
 
-    this.roomService.createRoom(username).subscribe({
-      next: (room: any) => {
-        this.router.navigate(['/', room]);
-      },
-      error: () => {
-        this.isCreatingRoom.set(false);
-        this.snackbar.open('Error creating room', undefined, { duration: 3000 });
-      },
-    });
+    this.roomService
+      .createRoom(username)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe({
+        next: (room: any) => {
+          this.router.navigate(['/', room]);
+        },
+        error: () => {
+          this.isCreatingRoom.set(false);
+          this.snackbar.open('Error creating room', undefined, { duration: 3000 });
+        },
+      });
   }
 }

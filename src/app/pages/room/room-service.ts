@@ -21,7 +21,6 @@ import {
 })
 export class RoomService {
   private readonly firestore = inject(Firestore);
-  private readonly newRoom = nanoid();
   private readonly _currentPlayer = signal<Player>({
     username: '',
     id: nanoid(),
@@ -66,31 +65,26 @@ export class RoomService {
   }
 
   createRoom(username: string) {
-    this._currentPlayer.update((player) => ({ ...player, username, room: this.newRoom }));
+    const newRoom = nanoid(6);
+    this._currentPlayer.update((player) => ({ ...player, username, room: newRoom }));
 
     const batch = writeBatch(this.firestore);
     const room = {
-      id: this.newRoom,
+      id: newRoom,
       name: '',
       createdBy: this.currentPlayer().id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const roomRef = doc(this.firestore, 'rooms', this.newRoom);
+    const roomRef = doc(this.firestore, 'rooms', newRoom);
     batch.set(roomRef, room);
-    const playerRef = doc(
-      this.firestore,
-      'rooms',
-      this.newRoom,
-      'players',
-      this.currentPlayer().id,
-    );
+    const playerRef = doc(this.firestore, 'rooms', newRoom, 'players', this.currentPlayer().id);
     batch.set(playerRef, this.currentPlayer());
 
     return from(batch.commit()).pipe(
       map(() => {
         this.saveLocalData(this.currentPlayer());
-        return this.newRoom;
+        return newRoom;
       }),
     );
   }

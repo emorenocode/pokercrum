@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
-import { EMPTY, finalize, retry, Subject, switchMap, takeUntil, throwError } from 'rxjs';
+import { retry, Subject, takeUntil } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -86,7 +86,7 @@ export class RoomPage implements OnChanges, OnDestroy {
   public readonly player = this.roomService.currentPlayer;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl(null, Validators.required);
-  public readonly currentRoom = computed<any>(() => this.roomService.currentRoom());
+  public readonly currentRoom = computed<Room | undefined>(() => this.roomService.currentRoom());
   public result!: Record<string, number>;
   public readonly showCountdown = signal(false);
   public readonly timerEnd = signal(0);
@@ -106,15 +106,13 @@ export class RoomPage implements OnChanges, OnDestroy {
       this.onDestroy$.next();
       this.getPlayers();
       this.onListenerRoom();
-      // this.onListenerReveal();
-      // this.getRoom();
     }
   }
 
   onListenerRoom() {
     this.roomService
       .onListenerRoom(this.roomCode())
-      .pipe(takeUntil(this.onDestroy$))
+      .pipe(takeUntil(this.onDestroy$), retry(3))
       .subscribe({
         next: (room) => {
           console.log('Room: ', room);
@@ -142,56 +140,6 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.showCards.set(roomData.show);
           this.isLoadingRoom.set(false);
         },
-        error: () => {
-          this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
-            duration: 3000,
-          });
-          this.router.navigate(['/']);
-        },
-      });
-  }
-
-  getRoom() {
-    this.isLoadingRoom.set(true);
-    this.roomService
-      .getRoom(this.roomCode())
-      .pipe(
-        switchMap((doc) => {
-          if (!doc.exists() && this.roomCode() !== this.player().room) {
-            return throwError(() => new Error('Room not found'));
-          }
-
-          const room = doc.data() as Room | undefined;
-          const roomOwner =
-            this.player().room === this.roomCode()
-              ? this.player()
-              : this.players().find(
-                  (player) => player.room === this.roomCode() || room?.createdBy === player.id,
-                );
-
-          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
-          this.roomService.currentRoom.set(room);
-          this.timerEnd.set(room?.timerEnd ?? 0);
-
-          const playerInRoom = {
-            ...this.player(),
-            ...this.players().find((p) => p.id === this.player().id),
-          } as Player;
-
-          if (playerInRoom) {
-            this.cardSelected.set(playerInRoom.card);
-          }
-
-          if (!playerInRoom.username) {
-            return EMPTY;
-          }
-
-          return this.roomService.joinRoom(playerInRoom, this.roomCode());
-        }),
-        finalize(() => this.isLoadingRoom.set(false)),
-        retry(3),
-      )
-      .subscribe({
         error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
             duration: 3000,
@@ -284,40 +232,6 @@ export class RoomPage implements OnChanges, OnDestroy {
         this.snackbar.open('Error to reveal cards', undefined, { duration: 3000 });
       },
     });
-  }
-
-  onListenerReveal() {
-    this.roomService
-      .getReveal(this.roomCode())
-      .pipe(takeUntil(this.onDestroy$))
-      .subscribe({
-        next: (res) => {
-          const reveal = res['show'] as boolean;
-
-          this.timerEnd.set(res['timerEnd'] ?? 0);
-
-          if (this.isInitialLoad() && reveal) {
-            this.showCountdown.set(true);
-            this.isInitialLoad.set(false);
-            return;
-          }
-
-          if (this.isInitialLoad()) {
-            this.onShowCards();
-            this.isInitialLoad.set(false);
-            return;
-          }
-
-          if (this.showCountdown() === reveal) {
-            this.showCountdown.set(false);
-            this.onShowCards();
-            return;
-          }
-
-          this.showCountdown.set(reveal);
-          this.showCards.set(!reveal);
-        },
-      });
   }
 
   onDeletePlayer(playerId: string) {
