@@ -53,7 +53,7 @@ export class HomePage implements OnInit, OnDestroy {
       .createRoom(username)
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
-        next: (room: any) => {
+        next: (room: string) => {
           this.router.navigate(['/', room]);
         },
         error: () => {
