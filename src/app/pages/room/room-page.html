@@ -52,6 +52,13 @@
       </section>
 
       <section>
+        @if (isOwner()) {
+          @if (showCards()) {
+            <button matButton="elevated" (click)="onResetCards()">Reset</button>
+          } @else {
+            <button matButton="elevated" (click)="onReveal()">Reveal</button>
+          }
+        }
         @if (showCards()) {
           <div class="section-title">
             <h2>Result</h2>
@@ -66,13 +73,6 @@
           </div>
         }
         <app-countdown [timerEnd]="timerEnd()" (stop)="onShowCards()" />
-        @if (isOwner()) {
-          @if (showCards()) {
-            <button matButton="elevated" (click)="onResetCards()">Reset</button>
-          } @else {
-            <button matButton="elevated" (click)="onReveal()">Reveal</button>
-          }
-        }
       </section>
     } @else {
       <div class="join-room">
