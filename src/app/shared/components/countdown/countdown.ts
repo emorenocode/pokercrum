@@ -61,6 +61,7 @@ export class Countdown implements OnChanges, OnDestroy {
         this.updateDisplay();
         this.stopCountdown();
         this.stop.emit();
+        this.displayTime.set('');
         return;
       }
 
@@ -69,6 +70,11 @@ export class Countdown implements OnChanges, OnDestroy {
   }
 
   private updateDisplay(): void {
+    if (this.timerEnd() === 0) {
+      this.displayTime.set('');
+      return;
+    }
+
     const minutes = Math.floor(this.remainingSeconds / 60);
     const seconds = this.remainingSeconds % 60;
 

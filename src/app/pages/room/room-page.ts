@@ -89,7 +89,6 @@ export class RoomPage implements OnChanges, OnDestroy {
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl(null, Validators.required);
   public readonly currentRoom = computed<Room | undefined>(() => this.roomService.currentRoom());
-  public readonly showCountdown = signal(false);
   public readonly timerEnd = signal(0);
   public result!: Record<string, number>;
 
@@ -138,12 +137,8 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
           this.roomService.currentRoom.set(roomData);
           this.timerEnd.set(roomData.timerEnd);
-          this.showCountdown.set(!roomData.show);
-          this.showCards.set(roomData.show);
           this.isLoadingRoom.set(false);
-          if (roomData.show) {
-            this.onShowCards();
-          }
+          this.onShowCards(roomData.show);
         },
         error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
@@ -167,6 +162,7 @@ export class RoomPage implements OnChanges, OnDestroy {
               this.cardSelected.set(player.card);
             }
           });
+          this.onShowCards(this.showCards());
         },
         error: () => {
           this.snackbar.open('Error to get players', undefined, { duration: 3000 });
@@ -194,7 +190,11 @@ export class RoomPage implements OnChanges, OnDestroy {
     });
   }
 
-  onShowCards() {
+  onShowCards(show = true) {
+    this.showCards.set(show);
+
+    if (!show) return;
+
     const result = countCards(this.players());
     const resultList: Result[] = [];
 
@@ -206,8 +206,7 @@ export class RoomPage implements OnChanges, OnDestroy {
       });
     });
     this.resultList.set(resultList.sort((a, b) => a.vote - b.vote));
-    this.showCards.set(true);
-    this.showCountdown.set(false);
+    this.timerEnd.set(0);
   }
 
   onSelectCard(card: Card) {

@@ -65,9 +65,7 @@
             }
           </div>
         }
-        @if (showCountdown() && !showCards()) {
-          <app-countdown [timerEnd]="timerEnd()" (stop)="onShowCards()" />
-        }
+        <app-countdown [timerEnd]="timerEnd()" (stop)="onShowCards()" />
         @if (isOwner()) {
           @if (showCards()) {
             <button matButton="elevated" (click)="onResetCards()">Reset</button>
