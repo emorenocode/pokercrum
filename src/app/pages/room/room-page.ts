@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
-import { retry, Subject, takeUntil } from 'rxjs';
+import { of, retry, Subject, switchMap, takeUntil, throwError } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -113,18 +113,9 @@ export class RoomPage implements OnChanges, OnDestroy {
   onListenerRoom() {
     this.roomService
       .onListenerRoom(this.roomCode())
-      .pipe(takeUntil(this.onDestroy$), retry(3))
-      .subscribe({
-        next: (room) => {
-          console.log('Room: ', room);
-
-          if (!room) {
-            this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
-              duration: 3000,
-            });
-            this.router.navigate(['/']);
-            return;
-          }
+      .pipe(
+        switchMap((room) => {
+          if (!room) return throwError(() => new Error('Room not found'));
 
           const roomData = room as Room;
           const roomOwner =
@@ -137,8 +128,28 @@ export class RoomPage implements OnChanges, OnDestroy {
           this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
           this.roomService.currentRoom.set(roomData);
           this.timerEnd.set(roomData.timerEnd);
-          this.isLoadingRoom.set(false);
           this.onShowCards(roomData.show);
+
+          if (this.isInitialLoad()) {
+            this.isInitialLoad.set(false);
+            this.player.update((player) => ({ id: player.id, username: player.username }));
+            this.players().forEach((player) => {
+              if (player.id === this.player().id) {
+                this.cardSelected.set(player.card);
+                this.player.update((p) => ({ ...p, card: player.card }));
+              }
+            });
+            return this.roomService.joinRoom(this.player(), this.roomCode());
+          }
+
+          return of(roomData);
+        }),
+        retry(3),
+        takeUntil(this.onDestroy$),
+      )
+      .subscribe({
+        next: () => {
+          this.isLoadingRoom.set(false);
         },
         error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
@@ -155,7 +166,6 @@ export class RoomPage implements OnChanges, OnDestroy {
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
         next: (qs) => {
-          console.log('Players: ', qs);
           this.players.set(qs as unknown as Player[]);
           this.players().forEach((player) => {
             if (player.id === this.player().id) {

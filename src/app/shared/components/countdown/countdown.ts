@@ -47,6 +47,13 @@ export class Countdown implements OnChanges, OnDestroy {
 
     const timerEnd = this.timerEnd() || new Date().getTime() + (this.seconds() ?? 30) * 1000;
 
+    if (this.timerEnd() <= new Date().getTime()) {
+      this.displayTime.set('');
+      this.stopCountdown();
+      this.stop.emit();
+      return;
+    }
+
     this.remainingSeconds = this.seconds();
     this.updateDisplay();
 
