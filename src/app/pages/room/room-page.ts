@@ -132,25 +132,13 @@ export class RoomPage implements OnChanges, OnDestroy {
 
           if (this.isInitialLoad()) {
             this.isInitialLoad.set(false);
-            this.player.update((player) => ({ id: player.id, username: player.username }));
             this.players().forEach((player) => {
               if (player.id === this.player().id) {
                 this.cardSelected.set(player.card);
-                this.player.update((p) => {
-                  let player;
-
-                  if (p.card) {
-                    player = { ...p, card: p.card };
-                  }
-
-                  if (p.room) {
-                    player = { ...p, room: p.room };
-                  }
-
-                  return player || p;
-                });
+                this.player.set(player);
               }
             });
+            console.log('Joining room with player', this.player());
             return this.roomService.joinRoom(this.player(), this.roomCode());
           }
 
