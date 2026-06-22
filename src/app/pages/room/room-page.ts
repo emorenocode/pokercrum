@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
-import { of, retry, Subject, switchMap, takeUntil, throwError } from 'rxjs';
+import { map, of, retry, Subject, switchMap, takeUntil, throwError } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -115,8 +115,17 @@ export class RoomPage implements OnChanges, OnDestroy {
       .onListenerRoom(this.roomCode())
       .pipe(
         switchMap((room) => {
-          if (!room) return throwError(() => new Error('Room not found'));
+          if (!room && this.player().room === this.roomCode()) {
+            return this.roomService
+              .createRoom(this.player().username)
+              .pipe(map(() => this.roomService.currentRoom()));
+          } else if (!room) {
+            return throwError(() => new Error('Room not found'));
+          }
 
+          return of(room);
+        }),
+        switchMap((room) => {
           const roomData = room as Room;
           const roomOwner =
             this.player().room === this.roomCode()
@@ -138,7 +147,6 @@ export class RoomPage implements OnChanges, OnDestroy {
                 this.player.set(player);
               }
             });
-            console.log('Joining room with player', this.player());
             return this.roomService.joinRoom(this.player(), this.roomCode());
           }
 

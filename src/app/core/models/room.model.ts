@@ -9,5 +9,4 @@ export interface Room {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
-  players: Player[];
 }

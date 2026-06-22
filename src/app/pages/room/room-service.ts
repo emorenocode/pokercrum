@@ -32,26 +32,43 @@ export class RoomService {
 
   createRoom(username: string) {
     const newRoom = nanoid();
-    this.playerStore.player.update((player) => ({ ...player, username, room: newRoom }));
+    this.playerStore.player.update((player) => {
+      if (player.room) return player;
+      return {
+        ...player,
+        username,
+        room: newRoom,
+      };
+    });
     const currentPlayer = this.playerStore.player();
 
     const batch = writeBatch(this.firestore);
-    const room = {
-      id: newRoom,
+    const room: Room = {
+      id: currentPlayer.room as string,
       name: '',
+      timer: 30,
+      timerEnd: 0,
+      show: false,
       createdBy: currentPlayer.id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const roomRef = doc(this.firestore, 'rooms', newRoom);
+    const roomRef = doc(this.firestore, 'rooms', currentPlayer.room as string);
     batch.set(roomRef, room);
-    const playerRef = doc(this.firestore, 'rooms', newRoom, 'players', currentPlayer.id);
+    const playerRef = doc(
+      this.firestore,
+      'rooms',
+      currentPlayer.room as string,
+      'players',
+      currentPlayer.id,
+    );
     batch.set(playerRef, currentPlayer);
 
     return from(batch.commit()).pipe(
       map(() => {
         this.playerStore.savePlayer(currentPlayer);
-        return newRoom;
+        this.currentRoom.set(room);
+        return currentPlayer.room as string;
       }),
     );
   }
