@@ -54,9 +54,13 @@
       <section>
         @if (isOwner()) {
           @if (showCards()) {
-            <button matButton="elevated" (click)="onResetCards()">Reset</button>
+            <button matButton="elevated" (click)="onResetCards()">
+              <mat-icon>refresh</mat-icon> Reset
+            </button>
           } @else {
-            <button matButton="elevated" (click)="onReveal()">Reveal</button>
+            <button matButton="elevated" (click)="onReveal()">
+              <mat-icon>visibility</mat-icon>Reveal
+            </button>
           }
         }
         @if (showCards()) {

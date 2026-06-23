@@ -12,5 +12,6 @@ body {
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
-  background-color: rgb(140, 192, 238);
+  background: linear-gradient(150deg, #0079b775, transparent);
+  overflow: hidden;
 }
