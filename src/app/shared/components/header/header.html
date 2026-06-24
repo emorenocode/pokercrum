@@ -6,17 +6,22 @@
   </div>
   <nav>
     @if (currentplayer.username != '') {
-    <button
-      mat-icon-button
-      title="Share Room"
-      #shared
-      (click)="openToShared(shared._elementRef.nativeElement, dialogToShared)"
-    >
-      <mat-icon>share</mat-icon>
-    </button>
-    <div class="player" title="{{ currentplayer.username }}" #avatar (click)="openUserInfo(avatar)">
-      {{ username() }}
-    </div>
+      <button
+        mat-icon-button
+        title="Share Room"
+        #shared
+        (click)="openToShared(shared._elementRef.nativeElement, dialogToShared)"
+      >
+        <mat-icon>share</mat-icon>
+      </button>
+      <div
+        class="player"
+        title="{{ currentplayer.username }}"
+        #avatar
+        (click)="openUserInfo(avatar)"
+      >
+        {{ username() }}
+      </div>
     }
   </nav>
 </header>

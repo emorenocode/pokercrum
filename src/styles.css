@@ -5,13 +5,14 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100dvh;
+html {
+  height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   background: linear-gradient(150deg, #0079b775, transparent);
   overflow: hidden;
+  min-height: 100%;
 }

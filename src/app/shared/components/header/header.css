@@ -1,3 +1,11 @@
+:host {
+  display: block;
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  background: #fff;
+}
+
 .navbar {
   display: flex;
   align-items: center;
@@ -20,7 +28,7 @@
   }
 
   .player {
-    outline: 2px solid #fff;
+    outline: 1px solid #878787;
     border-radius: 50%;
     padding: 5px;
     width: 40px;
@@ -30,7 +38,11 @@
     justify-content: center;
     cursor: pointer;
     background-color: #fff;
-    border: 1px solid #cecece;
+    border: 1px solid #dedede;
+    box-shadow: 0 0 15px 0 #144460ad inset;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #033a57;
   }
 }
 
