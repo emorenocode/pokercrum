@@ -1,3 +1,9 @@
+:host {
+  display: block;
+  height: 100dvh;
+  min-height: 100dvh;
+}
+
 main {
   margin-top: 60px;
   padding-top: 10px;
