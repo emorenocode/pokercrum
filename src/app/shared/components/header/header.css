@@ -20,7 +20,7 @@
   }
 
   .player {
-    outline: 1px solid;
+    outline: 2px solid #fff;
     border-radius: 50%;
     padding: 5px;
     width: 40px;
@@ -30,6 +30,7 @@
     justify-content: center;
     cursor: pointer;
     background-color: #fff;
+    border: 1px solid #cecece;
   }
 }
 
