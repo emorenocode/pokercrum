@@ -37,8 +37,7 @@ main {
     user-select: none;
 
     .result-label {
-      font-size: 26px;
-      line-height: 27px;
+      font-size: 12px;
     }
 
     .small-card {
