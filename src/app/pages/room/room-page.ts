@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Countdown } from '@/app/shared/components/countdown/countdown';
 import { Card, Player, Result, Room } from '@/app/core/models';
 import { PlayerStore } from '@/app/core/services/player-store';
+import { UICard } from '@/app/shared/components/card/card';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -46,6 +47,7 @@ export function countCards(list: Player[]): Record<string, number> {
     MatProgressSpinner,
     MatIconModule,
     Countdown,
+    UICard,
   ],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',

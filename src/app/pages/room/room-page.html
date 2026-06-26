@@ -11,15 +11,12 @@
         <h2>Cards</h2>
         <div class="card-list">
           @for (card of cards(); track $index) {
-            <button
-              class="card"
-              [class.selected]="card.value === cardSelected()?.value"
-              [class.disabled]="showCards()"
-              (click)="onSelectCard(card)"
-              matTooltip="{{ card.label }}"
-            >
-              {{ card.value }}
-            </button>
+            <ui-card
+              [card]="card"
+              [isSelected]="card.value === cardSelected()?.value"
+              [isDisabled]="showCards()"
+              (onSelect)="onSelectCard(card)"
+            />
           }
         </div>
       </section>

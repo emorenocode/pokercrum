@@ -1,0 +1,10 @@
+<div matTooltip="{{ card().label }}">
+  <button
+    class="card"
+    [class.selected]="isSelected()"
+    [class.disabled]="isDisabled()"
+    (click)="onSelect.emit(card())"
+  >
+    {{ card().value }}
+  </button>
+</div>
