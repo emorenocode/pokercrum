@@ -1,0 +1,12 @@
+<div class="user">
+  <div class="card disabled" [class.flipped]="showCards()">
+    <div class="card__inner">
+      <div class="card__front">{{ player().card?.value ? '🔥' : '' }}</div>
+      <div class="card__back">{{ showCards() ? player().card?.value : '' }}</div>
+    </div>
+    @if (showDelete()) {
+      <button title="Delete Player" (click)="onDelete.emit(player().id)">×</button>
+    }
+  </div>
+  <span>{{ player().username }}</span>
+</div>

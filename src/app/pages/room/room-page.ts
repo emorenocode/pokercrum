@@ -23,6 +23,7 @@ import { Countdown } from '@/app/shared/components/countdown/countdown';
 import { Card, Player, Result, Room } from '@/app/core/models';
 import { PlayerStore } from '@/app/core/services/player-store';
 import { UICard } from '@/app/shared/components/card/card';
+import { UIPlayer } from '@/app/shared/components/player/player';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -48,6 +49,7 @@ export function countCards(list: Player[]): Record<string, number> {
     MatIconModule,
     Countdown,
     UICard,
+    UIPlayer,
   ],
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',

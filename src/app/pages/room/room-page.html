@@ -32,18 +32,12 @@
         </h2>
         <div class="user-list">
           @for (player of players(); track $index) {
-            <div class="user">
-              <div class="card disabled" [class.flipped]="showCards()">
-                <div class="card__inner">
-                  <div class="card__front">{{ player.card?.value ? '🔥' : '' }}</div>
-                  <div class="card__back">{{ showCards() ? player.card?.value : '' }}</div>
-                </div>
-                @if (isOwner() && currentPlayer.id !== player.id) {
-                  <button title="Delete Player" (click)="onDeletePlayer(player.id)">×</button>
-                }
-              </div>
-              <span>{{ player.username }}</span>
-            </div>
+            <ui-player
+              [player]="player"
+              [showCards]="showCards()"
+              [isOwner]="isOwner()"
+              (onDelete)="onDeletePlayer($event)"
+            />
           }
         </div>
       </section>
