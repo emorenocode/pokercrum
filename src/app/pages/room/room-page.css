@@ -67,7 +67,7 @@ main {
   transition: all 0.2s ease-in;
   border-radius: 4px;
   perspective: 1000px;
-  background-color: #fff;
+  background-color: #f4f7f8;
   font-size: 28px;
 
   button {
@@ -113,11 +113,11 @@ main {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: inherit;
-  background-color: #fff;
+  background-color: #f4f7f8;
 }
 
 .card__front {
-  background-color: #d6c7b2;
+  background: linear-gradient(45deg, #629eb2, transparent);
 }
 
 .card__back {
@@ -161,7 +161,7 @@ main {
       justify-content: center;
       border-radius: 4px;
       font-size: 18px;
-      background-color: #fff;
+      background-color: #f4f7f8;
     }
   }
 }
