@@ -29,6 +29,11 @@ main {
     font-size: 20px;
     background: transparent;
   }
+
+  span {
+    font-size: 0.9rem;
+    padding: 2px;
+  }
 }
 
 .card-list {
@@ -161,7 +166,7 @@ main {
       justify-content: center;
       border-radius: 4px;
       font-size: 18px;
-      background-color: #f4f7f8;
+      background: #f4f7f8;
     }
   }
 }
