@@ -94,7 +94,7 @@ export class RoomService {
     const currentPlayer = this.playerStore.player();
     const roomRef = doc(this.firestore, 'rooms', roomCode);
     const roomToUpdate = this.currentRoom()
-      ? { ...this.currentRoom(), show, updatedAt: new Date() }
+      ? { ...this.currentRoom(), show, updatedAt: new Date(), timerEnd: 0 }
       : {
           show,
           name: '',
@@ -102,6 +102,8 @@ export class RoomService {
           createdBy: currentPlayer.id,
           createdAt: new Date(),
           updatedAt: new Date(),
+          timer: 30,
+          timerEnd: 0,
         };
     const promise: Promise<void> = this.currentRoom()
       ? updateDoc(roomRef, roomToUpdate)

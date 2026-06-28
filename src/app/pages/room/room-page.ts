@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  OnChanges,
-  OnDestroy,
-  signal,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, computed, effect, inject, input, OnDestroy, signal } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,6 +29,23 @@ export function countCards(list: Player[]): Record<string, number> {
   );
 }
 
+const CARDS: Card[] = [
+  { value: '0', label: 'No effort (already done or trivial)' },
+  { value: '1/2', label: 'Tiny effort (almost nothing)' },
+  { value: '1', label: 'Very small effort (quick change)' },
+  { value: '2', label: 'Small effort (simple task)' },
+  { value: '3', label: 'Medium effort (moderate complexity)' },
+  { value: '5', label: 'Medium to large effort (some complexity)' },
+  { value: '8', label: 'Large effort (complex or multi-step)' },
+  { value: '13', label: 'Very large effort (significant work)' },
+  { value: '20', label: 'Huge effort (requires planning)' },
+  { value: '40', label: 'Massive effort (multiple sprints)' },
+  { value: '100', label: 'Enormous effort (likely needs to be split)' },
+  { value: '?', label: 'Unclear — needs clarification before estimating' },
+  { value: '♾️', label: 'Too big to estimate — break it down' },
+  { value: '☕️', label: 'Time for a break ☕️' },
+];
+
 @Component({
   selector: 'app-room',
   imports: [
@@ -54,7 +62,7 @@ export function countCards(list: Player[]): Record<string, number> {
   templateUrl: './room-page.html',
   styleUrl: './room-page.css',
 })
-export class RoomPage implements OnChanges, OnDestroy {
+export class RoomPage implements OnDestroy {
   private readonly metaTitle = inject(Title);
   private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
@@ -63,61 +71,71 @@ export class RoomPage implements OnChanges, OnDestroy {
   private readonly router = inject(Router);
   private readonly playerStore = inject(PlayerStore);
 
+  protected readonly cards: Card[] = CARDS;
   protected readonly isOwner = computed(() => {
     const room = this.roomService.currentRoom();
     return room?.createdBy === this.player().id;
   });
+  protected readonly resultList = computed<Result[]>(() => {
+    if (!this.showCards()) return [];
+
+    const result = countCards(this.players());
+
+    return Object.entries(result)
+      .map(([card, vote]) => ({
+        vote,
+        card,
+        label: `( ${vote} vote${vote > 1 ? 's' : ''} )`,
+      }))
+      .sort((a, b) => a.vote - b.vote);
+  });
 
   public readonly isLoadingRoom = signal(true);
-  public readonly showCards = signal(false);
-  public readonly cards = signal<Card[]>([
-    { value: '0', label: 'No effort (already done or trivial)' },
-    { value: '1/2', label: 'Tiny effort (almost nothing)' },
-    { value: '1', label: 'Very small effort (quick change)' },
-    { value: '2', label: 'Small effort (simple task)' },
-    { value: '3', label: 'Medium effort (moderate complexity)' },
-    { value: '5', label: 'Medium to large effort (some complexity)' },
-    { value: '8', label: 'Large effort (complex or multi-step)' },
-    { value: '13', label: 'Very large effort (significant work)' },
-    { value: '20', label: 'Huge effort (requires planning)' },
-    { value: '40', label: 'Massive effort (multiple sprints)' },
-    { value: '100', label: 'Enormous effort (likely needs to be split)' },
-    { value: '?', label: 'Unclear — needs clarification before estimating' },
-    { value: '♾️', label: 'Too big to estimate — break it down' },
-    { value: '☕️', label: 'Time for a break ☕️' },
-  ]);
+  public readonly showCards = signal(true);
   public readonly players = signal<Player[]>([]);
   public readonly cardSelected = signal<Card | undefined>(undefined);
-  public readonly resultList = signal<Result[]>([]);
   public readonly player = this.playerStore.player;
   public readonly roomCode = input.required<string>();
-  public readonly username = new FormControl(null, Validators.required);
-  public readonly currentRoom = computed<Room | undefined>(() => this.roomService.currentRoom());
+  public readonly username = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.required],
+  });
+  public readonly currentRoom = this.roomService.currentRoom;
   public readonly timerEnd = signal(0);
-  public result!: Record<string, number>;
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const room = this.roomCode();
+      if (room) {
+        this.resetRoomState();
+        this.startRoom();
+      }
+    });
+  }
 
   ngOnDestroy(): void {
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['roomCode']) {
-      this.cardSelected.set(undefined);
-      this.showCards.set(false);
-      this.resultList.set([]);
-      this.onDestroy$.next();
-      this.getPlayers();
-      this.onListenerRoom();
-    }
+  private startRoom() {
+    this.getPlayers();
+    this.onListenerRoom();
   }
 
-  onListenerRoom() {
+  private resetRoomState() {
+    this.onDestroy$.next();
+    this.cardSelected.set(undefined);
+    this.showCards.set(true);
+    this.isInitialLoad.set(true);
+    this.isLoadingRoom.set(true);
+  }
+
+  private onListenerRoom() {
     this.roomService
       .onListenerRoom(this.roomCode())
       .pipe(
+        retry(3),
         switchMap((room) => {
           if (!room && this.player().room === this.roomCode()) {
             return this.roomService
@@ -131,43 +149,36 @@ export class RoomPage implements OnChanges, OnDestroy {
         }),
         switchMap((room) => {
           const roomData = room as Room;
-          const roomOwner =
-            this.player().room === this.roomCode()
-              ? this.player()
-              : this.players().find(
-                  (player) => player.room === this.roomCode() || roomData.createdBy === player.id,
-                );
-
-          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
           this.roomService.currentRoom.set(roomData);
-          this.timerEnd.set(roomData.timerEnd);
-          this.onShowCards(roomData.show);
 
           if (this.isInitialLoad()) {
-            this.isInitialLoad.set(false);
             if (this.player().username.trim() === '') {
               return of(roomData);
             }
 
-            this.players().forEach((player) => {
-              if (player.id === this.player().id) {
-                this.cardSelected.set(player.card);
-                this.playerStore.player.update((currentPlayer) => ({
-                  ...currentPlayer,
-                  ...player,
-                }));
-              }
-            });
-            return this.roomService.joinRoom(this.player(), this.roomCode());
+            const currentPlayer = this.getCurrentPlayer();
+            if (currentPlayer) {
+              this.cardSelected.set(currentPlayer.card);
+              this.playerStore.player.update((player) => ({
+                ...player,
+                ...currentPlayer,
+              }));
+            }
+
+            return this.roomService
+              .joinRoom(this.player(), this.roomCode())
+              .pipe(map(() => roomData));
           }
 
           return of(roomData);
         }),
-        retry(3),
         takeUntil(this.onDestroy$),
       )
       .subscribe({
-        next: () => {
+        next: (room) => {
+          this.timerEnd.set(room.timerEnd);
+          this.showCards.set(room.show);
+          this.isInitialLoad.set(false);
           this.isLoadingRoom.set(false);
         },
         error: () => {
@@ -179,19 +190,32 @@ export class RoomPage implements OnChanges, OnDestroy {
       });
   }
 
-  getPlayers() {
+  private getCurrentPlayer() {
+    return this.players().find((player) => player.id === this.player().id);
+  }
+
+  private getPlayers() {
     this.roomService
       .getPlayers(this.roomCode())
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
         next: (qs) => {
+          if (qs.length === 0) return;
+
           this.players.set(qs as unknown as Player[]);
-          this.players().forEach((player) => {
-            if (player.id === this.player().id) {
-              this.cardSelected.set(player.card);
-            }
-          });
-          this.onShowCards(this.showCards());
+          const currentPlayer = this.getCurrentPlayer();
+          if (currentPlayer) {
+            this.cardSelected.set(currentPlayer.card);
+          }
+          const roomOwner =
+            this.player().room === this.roomCode()
+              ? this.player()
+              : this.players().find(
+                  (player) =>
+                    player.room === this.roomCode() || this.currentRoom()?.createdBy === player.id,
+                );
+
+          this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
         },
         error: () => {
           this.snackbar.open('Error to get players', undefined, { duration: 3000 });
@@ -200,7 +224,7 @@ export class RoomPage implements OnChanges, OnDestroy {
   }
 
   onJoinRoom() {
-    const username = this.username.value ?? '';
+    const username = this.username.value;
     if (this.username.invalid || username.trim() === '') {
       this.username.reset();
       this.username.markAllAsTouched();
@@ -217,25 +241,6 @@ export class RoomPage implements OnChanges, OnDestroy {
         this.snackbar.open('Error to join room', undefined, { duration: 3000 });
       },
     });
-  }
-
-  onShowCards(show = true) {
-    this.showCards.set(show);
-
-    if (!show) return;
-
-    const result = countCards(this.players());
-    const resultList: Result[] = [];
-
-    Object.entries(result).forEach(([key, value]) => {
-      resultList.push({
-        vote: value,
-        card: key,
-        label: `( ${value} vote${value > 1 ? 's' : ''} )`,
-      });
-    });
-    this.resultList.set(resultList.sort((a, b) => a.vote - b.vote));
-    this.timerEnd.set(0);
   }
 
   onSelectCard(card: Card) {
