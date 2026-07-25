@@ -93,7 +93,7 @@ export class RoomPage implements OnDestroy {
   public readonly isLoadingRoom = signal(true);
   public readonly showCards = signal(true);
   public readonly players = signal<Player[]>([]);
-  public readonly cardSelected = signal<Card | undefined>(undefined);
+  public readonly cardSelected = signal<Card | undefined | null>(undefined);
   public readonly player = this.playerStore.player;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl<string>('', {

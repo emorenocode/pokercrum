@@ -4,6 +4,6 @@ export interface Player {
   id: string;
   username: string;
   fromMobile: boolean;
-  card?: Card;
+  card?: Card | null;
   room?: string;
 }
