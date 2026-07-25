@@ -1,14 +1,18 @@
-import { Player } from '@/app/core/models';
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { nanoid } from 'nanoid';
+import { Player } from '@/app/core/models';
+import { DetectDevice } from '@/app/core/services/detect-device';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlayerStore {
+  private readonly detectDevice = inject(DetectDevice);
+
   readonly player = signal<Player>({
     username: '',
     id: nanoid(),
+    fromMobile: this.detectDevice.isMobile,
   });
 
   constructor() {
@@ -34,6 +38,8 @@ export class PlayerStore {
     }
 
     if (!player) return;
+
+    player.fromMobile = this.detectDevice.isMobile;
 
     this.player.set(player);
   }

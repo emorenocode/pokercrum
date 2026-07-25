@@ -135,7 +135,11 @@ export class RoomService {
   onResetCards(roomCode: string, players: Player[]) {
     const batch = writeBatch(this.firestore);
     players.forEach((player) => {
-      const playerUpdate: Player = { id: player.id, username: player.username };
+      const playerUpdate: Player = {
+        id: player.id,
+        username: player.username,
+        fromMobile: player.fromMobile,
+      };
       const playerRef = doc(this.firestore, 'rooms', roomCode, 'players', player.id);
       batch.set(playerRef, { ...playerUpdate });
     });
