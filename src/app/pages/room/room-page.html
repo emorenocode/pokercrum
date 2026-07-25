@@ -67,7 +67,9 @@
             }
           </div>
         }
-        <app-countdown [timerEnd]="timerEnd()" (stop)="showCards.set(true)" />
+        @if (timerEnd() > 0) {
+          <app-countdown [timerEnd]="timerEnd()" (stop)="showCards.set(true)" />
+        }
       </section>
     } @else {
       <div class="join-room">

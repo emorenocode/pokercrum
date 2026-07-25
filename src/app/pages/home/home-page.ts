@@ -53,8 +53,8 @@ export class HomePage implements OnInit, OnDestroy {
       .createRoom(username)
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
-        next: (room: string) => {
-          this.router.navigate(['/', room]);
+        next: (room) => {
+          this.router.navigate(['/', room.id]);
         },
         error: () => {
           this.isCreatingRoom.set(false);

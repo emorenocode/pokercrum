@@ -68,7 +68,7 @@ export class RoomService {
       map(() => {
         this.playerStore.savePlayer(currentPlayer);
         this.currentRoom.set(room);
-        return currentPlayer.room as string;
+        return room;
       }),
     );
   }
@@ -79,10 +79,10 @@ export class RoomService {
 
   joinRoom(player: Player, roomCode: string) {
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
-      map(() => player),
       tap(() => {
         this.playerStore.savePlayer(player);
       }),
+      map(() => player),
     );
   }
 
@@ -125,7 +125,11 @@ export class RoomService {
   }
 
   onListenerRoom(roomCode: string) {
-    return docData(doc(this.firestore, 'rooms', roomCode));
+    return docData(doc(this.firestore, 'rooms', roomCode)).pipe(
+      tap((room) => {
+        this.currentRoom.set(room as Room);
+      }),
+    );
   }
 
   onResetCards(roomCode: string, players: Player[]) {

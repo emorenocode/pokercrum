@@ -106,10 +106,9 @@ export class RoomPage implements OnDestroy {
   constructor() {
     effect(() => {
       const room = this.roomCode();
-      if (room) {
-        this.resetRoomState();
-        this.startRoom();
-      }
+      if (!room) return;
+      this.resetRoomState();
+      this.startRoom();
     });
   }
 
@@ -138,9 +137,7 @@ export class RoomPage implements OnDestroy {
         retry(3),
         switchMap((room) => {
           if (!room && this.player().room === this.roomCode()) {
-            return this.roomService
-              .createRoom(this.player().username)
-              .pipe(map(() => this.roomService.currentRoom()));
+            return this.roomService.createRoom(this.player().username);
           } else if (!room) {
             return throwError(() => new Error('Room not found'));
           }
@@ -149,28 +146,21 @@ export class RoomPage implements OnDestroy {
         }),
         switchMap((room) => {
           const roomData = room as Room;
-          this.roomService.currentRoom.set(roomData);
+          if (!this.isInitialLoad()) return of(roomData);
+          if (this.player().username.trim() === '') return of(roomData);
 
-          if (this.isInitialLoad()) {
-            if (this.player().username.trim() === '') {
-              return of(roomData);
-            }
-
-            const currentPlayer = this.getCurrentPlayer();
-            if (currentPlayer) {
-              this.cardSelected.set(currentPlayer.card);
-              this.playerStore.player.update((player) => ({
-                ...player,
-                ...currentPlayer,
-              }));
-            }
-
-            return this.roomService
-              .joinRoom(this.player(), this.roomCode())
-              .pipe(map(() => roomData));
+          const currentPlayer = this.getCurrentPlayer();
+          if (currentPlayer) {
+            this.cardSelected.set(currentPlayer.card);
+            this.playerStore.player.update((player) => ({
+              ...player,
+              ...currentPlayer,
+            }));
           }
 
-          return of(roomData);
+          return this.roomService
+            .joinRoom(this.player(), this.roomCode())
+            .pipe(map(() => roomData));
         }),
         takeUntil(this.onDestroy$),
       )
@@ -200,9 +190,10 @@ export class RoomPage implements OnDestroy {
       .pipe(takeUntil(this.onDestroy$))
       .subscribe({
         next: (qs) => {
-          if (qs.length === 0) return;
+          const players = qs as unknown as Player[];
+          if (players.length === 0) return;
 
-          this.players.set(qs as unknown as Player[]);
+          this.players.set(players);
           const currentPlayer = this.getCurrentPlayer();
           if (currentPlayer) {
             this.cardSelected.set(currentPlayer.card);
@@ -253,7 +244,6 @@ export class RoomPage implements OnDestroy {
         this.snackbar.open('Error to select card', undefined, { duration: 3000 });
       },
     });
-    this.isInitialLoad.set(false);
   }
 
   onResetCards() {

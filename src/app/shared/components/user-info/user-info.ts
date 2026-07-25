@@ -52,8 +52,8 @@ export class UserInfo {
 
   createRoom() {
     this.roomService.createRoom(this.player().username).subscribe({
-      next: (roomCode) => {
-        this.goToRoom(roomCode);
+      next: (room) => {
+        this.goToRoom(room.id);
       },
     });
   }
