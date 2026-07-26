@@ -1,19 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  height: 100dvh;
+html,
+body {
+  width: 100%;
+  min-height: 100%;
 }
 
 body {
-  margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
-  background: linear-gradient(150deg, #0079b775, transparent);
-  overflow: hidden;
-  height: 100dvh;
-  min-height: 100dvh;
+  background: #fff;
 }

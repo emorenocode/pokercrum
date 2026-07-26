@@ -71,12 +71,14 @@ section {
       padding: 0 10px;
       display: inline-flex;
       align-items: center;
+      width: 100%;
+      justify-content: center;
 
       &::before,
       &::after {
         display: inline-block;
         content: '';
-        width: 100px;
+        width: 25%;
         border-bottom: 1px solid #828d9b87;
         margin: 0 10px;
       }

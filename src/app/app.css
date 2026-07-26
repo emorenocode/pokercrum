@@ -1,4 +1,17 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+:host::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(150deg, #0079b775 0%, transparent 100%);
+}
+
 main {
-  height: 100dvh;
+  min-height: 100dvh;
   overflow: auto;
 }
