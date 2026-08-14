@@ -52,6 +52,7 @@ export class RoomService {
       createdBy: currentPlayer.id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      autoRevealCards: false,
     };
     const roomRef = doc(this.firestore, 'rooms', currentPlayer.room as string);
     batch.set(roomRef, room);

@@ -9,4 +9,5 @@ export interface Room {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
+  autoRevealCards: boolean;
 }

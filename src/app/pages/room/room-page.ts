@@ -207,11 +207,26 @@ export class RoomPage implements OnDestroy {
                 );
 
           this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
+          this.onAutoRevealCardsChange(players);
         },
         error: () => {
           this.snackbar.open('Error to get players', undefined, { duration: 3000 });
         },
       });
+  }
+
+  onAutoRevealCardsChange(players: Player[]) {
+    const room = this.currentRoom();
+    const counterIsActive = this.timerEnd() > Date.now();
+    const allPlayersHaveCards = players.every((player) => player.card);
+    const isAutoRevealEnabled = room?.autoRevealCards ?? false;
+
+    if (!room) return;
+
+    if (isAutoRevealEnabled && counterIsActive && allPlayersHaveCards) {
+      this.showCards.set(true);
+      this.timerEnd.set(0);
+    }
   }
 
   onJoinRoom() {
