@@ -221,7 +221,7 @@ export class RoomPage implements OnDestroy {
     const allPlayersHaveCards = players.every((player) => player.card);
     const isAutoRevealEnabled = room?.autoRevealCards ?? false;
 
-    if (!room || (isAutoRevealEnabled && !allPlayersHaveCards)) return;
+    if (!room || !isAutoRevealEnabled || (isAutoRevealEnabled && !allPlayersHaveCards)) return;
 
     this.showCards.set(true);
     this.timerEnd.set(0);
