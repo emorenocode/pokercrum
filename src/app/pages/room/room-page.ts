@@ -170,6 +170,7 @@ export class RoomPage implements OnDestroy {
           this.showCards.set(room.show);
           this.isInitialLoad.set(false);
           this.isLoadingRoom.set(false);
+          this.onAutoRevealCardsChange(this.players());
         },
         error: () => {
           this.snackbar.open(`Room ${this.roomCode()} not found`, undefined, {
@@ -217,16 +218,13 @@ export class RoomPage implements OnDestroy {
 
   onAutoRevealCardsChange(players: Player[]) {
     const room = this.currentRoom();
-    const counterIsActive = this.timerEnd() > Date.now();
     const allPlayersHaveCards = players.every((player) => player.card);
     const isAutoRevealEnabled = room?.autoRevealCards ?? false;
 
-    if (!room) return;
+    if (!room || (isAutoRevealEnabled && !allPlayersHaveCards)) return;
 
-    if (isAutoRevealEnabled && counterIsActive && allPlayersHaveCards) {
-      this.showCards.set(true);
-      this.timerEnd.set(0);
-    }
+    this.showCards.set(true);
+    this.timerEnd.set(0);
   }
 
   onJoinRoom() {
