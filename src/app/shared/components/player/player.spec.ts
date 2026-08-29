@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { Player } from '@/app/core/models';
 import { UIPlayer } from './player';
 
 describe('UIPlayer', () => {
@@ -13,6 +14,11 @@ describe('UIPlayer', () => {
 
     fixture = TestBed.createComponent(UIPlayer);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('player', {
+      id: 'player-id',
+      username: 'Player',
+      fromMobile: false,
+    } satisfies Player);
     await fixture.whenStable();
   });
 

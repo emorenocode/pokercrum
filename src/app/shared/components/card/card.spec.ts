@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { Card } from '@/app/core/models';
 import { UICard } from './card';
 
 describe('UICard', () => {
@@ -13,6 +14,7 @@ describe('UICard', () => {
 
     fixture = TestBed.createComponent(UICard);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('card', { value: '1', label: 'One' } satisfies Card);
     await fixture.whenStable();
   });
 

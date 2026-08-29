@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Firestore } from '@angular/fire/firestore';
 
 import { RoomSettings } from './room-settings';
 
@@ -8,9 +9,9 @@ describe('RoomSettings', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RoomSettings]
-    })
-    .compileComponents();
+      imports: [RoomSettings],
+      providers: [{ provide: Firestore, useValue: {} }],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RoomSettings);
     component = fixture.componentInstance;

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Firestore } from '@angular/fire/firestore';
 
 import { HomePage } from './home-page';
 
@@ -9,6 +10,7 @@ describe('HomePage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HomePage],
+      providers: [{ provide: Firestore, useValue: {} }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomePage);
