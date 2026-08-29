@@ -1,6 +1,6 @@
 import { Room } from '@/app/core/models';
 import { RoomService } from '@/app/pages/room/room-service';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 
@@ -8,6 +8,7 @@ import { debounceTime } from 'rxjs';
   selector: 'app-timer-field',
   imports: [ReactiveFormsModule],
   templateUrl: './timer-field.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './timer-field.css',
 })
 export class TimerField implements OnInit {

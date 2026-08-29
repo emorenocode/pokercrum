@@ -1,11 +1,12 @@
 import { Card } from '@/app/core/models/card.model';
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'ui-card',
   imports: [MatTooltipModule],
   templateUrl: './card.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './card.css',
 })
 export class UICard {

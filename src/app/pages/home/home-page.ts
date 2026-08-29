@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RoomService } from '@/app/pages/room/room-service';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,6 +10,7 @@ import { PlayerStore } from '@/app/core/services/player-store';
   selector: 'app-home',
   imports: [ReactiveFormsModule],
   templateUrl: './home-page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home-page.css',
 })
 export class HomePage implements OnInit, OnDestroy {

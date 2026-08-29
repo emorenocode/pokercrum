@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RoomService } from '@/app/pages/room/room-service';
 import { Player } from '@/app/core/models';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { PlayerStore } from '@/app/core/services/player-store';
   selector: 'app-user-info',
   imports: [RoomSettings],
   templateUrl: './user-info.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-info.css',
 })
 export class UserInfo {

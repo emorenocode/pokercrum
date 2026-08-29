@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, OnDestroy, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -60,6 +60,7 @@ const CARDS: Card[] = [
     UIPlayer,
   ],
   templateUrl: './room-page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './room-page.css',
 })
 export class RoomPage implements OnDestroy {

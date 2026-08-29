@@ -1,11 +1,12 @@
 import { Player } from '@/app/core/models/player.model';
 import { PlayerStore } from '@/app/core/services/player-store';
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'ui-player',
   imports: [],
   templateUrl: './player.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './player.css',
 })
 export class UIPlayer {

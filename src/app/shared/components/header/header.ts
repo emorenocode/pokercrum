@@ -1,4 +1,4 @@
-import { Component, computed, inject, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, computed, inject, TemplateRef, ViewContainerRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -12,6 +12,7 @@ import { PlayerStore } from '@/app/core/services/player-store';
   selector: 'app-header',
   imports: [MatIconModule, MatIconButton, MatButton, OverlayModule],
   templateUrl: './header.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './header.css',
 })
 export class Header {

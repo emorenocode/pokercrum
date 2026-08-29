@@ -1,4 +1,4 @@
-import { Component, inject, model } from '@angular/core';
+import { Component, inject, model, ChangeDetectionStrategy } from '@angular/core';
 import { TimerField } from '../timer-field/timer-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RoomService } from '@/app/pages/room/room-service';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-room-settings',
   imports: [TimerField, MatCheckboxModule, FormsModule],
   templateUrl: './room-settings.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './room-settings.css',
 })
 export class RoomSettings {

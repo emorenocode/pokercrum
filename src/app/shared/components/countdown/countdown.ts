@@ -6,6 +6,7 @@ import {
   output,
   signal,
   SimpleChanges,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 
@@ -17,6 +18,7 @@ import { interval, Subscription } from 'rxjs';
       {{ displayTime() }}
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `
       .countdown {
