@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  OnDestroy,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,13 +17,13 @@ import { Header } from '@/app/shared/components/header/header';
 import { map, of, retry, Subject, switchMap, takeUntil, throwError } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { Countdown } from '@/app/shared/components/countdown/countdown';
 import { Card, Player, Result, Room } from '@/app/core/models';
 import { PlayerStore } from '@/app/core/services/player-store';
 import { UICard } from '@/app/shared/components/card/card';
 import { UIPlayer } from '@/app/shared/components/player/player';
+import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -53,11 +62,11 @@ const CARDS: Card[] = [
     MatButtonModule,
     MatTooltipModule,
     Header,
-    MatProgressSpinner,
     MatIconModule,
     Countdown,
     UICard,
     UIPlayer,
+    NgxSkeletonLoaderComponent,
   ],
   templateUrl: './room-page.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -103,6 +112,14 @@ export class RoomPage implements OnDestroy {
   });
   public readonly currentRoom = this.roomService.currentRoom;
   public readonly timerEnd = signal(0);
+  public readonly totalPlayers = computed(() => {
+    return !this.isLoadingRoom() && this.players().length > 0
+      ? ' (' + this.players().length + ')'
+      : '';
+  });
+  public readonly showDeleteAllPlayerButton = computed(() => {
+    return !this.isLoadingRoom() && this.players().length > 0 && this.isOwner();
+  });
 
   constructor() {
     effect(() => {

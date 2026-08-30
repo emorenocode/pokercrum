@@ -11,9 +11,11 @@ import { getAnalytics, provideAnalytics, ScreenTrackingService } from '@angular/
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 import { environment } from '../environments/environment';
+import { provideNgxSkeletonLoader } from 'ngx-skeleton-loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    ScreenTrackingService,
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
@@ -25,7 +27,7 @@ export const appConfig: ApplicationConfig = {
       });
     }),
     provideAnalytics(() => getAnalytics()),
-    ScreenTrackingService,
     provideFirestore(() => getFirestore()),
+    provideNgxSkeletonLoader(),
   ],
 };

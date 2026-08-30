@@ -1,36 +1,48 @@
 @let currentPlayer = player();
 <app-header />
 <main>
-  @if (isLoadingRoom()) {
-    <div class="spinner-container">
-      <mat-spinner />
-    </div>
-  } @else {
-    @if (currentPlayer.username != '') {
-      <section class="card-list-container">
-        <h2>Cards</h2>
-        <div class="card-list">
-          @for (card of cards; track $index) {
-            <ui-card
-              [card]="card"
-              [isSelected]="card.value === cardSelected()?.value"
-              [isDisabled]="showCards()"
-              (onSelect)="onSelectCard(card)"
-            />
-          }
-        </div>
-      </section>
+  @if (currentPlayer.username != '') {
+    <section class="card-list-container">
+      <h2>Cards</h2>
+      <div class="card-list">
+        @for (card of cards; track $index) {
+          <ui-card
+            [card]="card"
+            [isSelected]="card.value === cardSelected()?.value"
+            [isDisabled]="showCards()"
+            (onSelect)="onSelectCard(card)"
+          />
+        }
+      </div>
+    </section>
 
-      <section class="participants">
-        <h2 class="title">
-          Players {{ players().length > 0 ? ' (' + players().length + ')' : '' }}
-          @if (players().length > 0 && isOwner()) {
-            <button matIconButton title="Delete all" (click)="onClearAll()">
-              <mat-icon>delete_forever</mat-icon>
-            </button>
-          }
-        </h2>
-        <div class="user-list">
+    <section class="participants">
+      <h2 class="title">
+        Players {{ totalPlayers() }}
+        @if (showDeleteAllPlayerButton()) {
+          <button matIconButton title="Delete all" (click)="onClearAll()">
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        }
+      </h2>
+
+      <div class="user-list">
+        @if (isLoadingRoom()) {
+          <ngx-skeleton-loader
+            count="5"
+            appearance="square"
+            [theme]="{
+              width: '40px',
+              height: '50px',
+              background: 'linear-gradient(45deg, #629eb2, transparent)',
+              outline: '1px solid #fff',
+              'border-radius': '4px',
+              'margin-right': '15px',
+              'margin-bottom': '24px',
+              'box-shadow': '0 0 4px 0px #000',
+            }"
+          />
+        } @else {
           @for (player of players(); track $index) {
             <ui-player
               [player]="player"
@@ -39,21 +51,23 @@
               (onDelete)="onDeletePlayer($event)"
             />
           }
-        </div>
-      </section>
-
-      <section>
-        @if (isOwner()) {
-          @if (showCards()) {
-            <button matButton="elevated" (click)="onResetCards()">
-              <mat-icon>refresh</mat-icon> Reset
-            </button>
-          } @else {
-            <button matButton="elevated" (click)="onReveal()">
-              <mat-icon>visibility</mat-icon>Reveal
-            </button>
-          }
         }
+      </div>
+    </section>
+
+    <section>
+      @if (isOwner()) {
+        @if (showCards()) {
+          <button matButton="elevated" (click)="onResetCards()">
+            <mat-icon>refresh</mat-icon> Reset
+          </button>
+        } @else {
+          <button matButton="elevated" (click)="onReveal()">
+            <mat-icon>visibility</mat-icon>Reveal
+          </button>
+        }
+      }
+      @if (!isLoadingRoom()) {
         @if (showCards()) {
           <div class="section-title">
             <h2>Result</h2>
@@ -70,24 +84,19 @@
         @if (timerEnd() > 0) {
           <app-countdown [timerEnd]="timerEnd()" (stop)="showCards.set(true)" />
         }
-      </section>
-    } @else {
-      <div class="join-room">
-        <div class="input-btn">
-          <input
-            type="text"
-            name="username"
-            placeholder="Enter Username"
-            [formControl]="username"
-          />
-          <button (click)="onJoinRoom()">Join Room</button>
-        </div>
-        <div style="height: 19px">
-          @if (username.touched && username.invalid) {
-            <span>username is required</span>
-          }
-        </div>
+      }
+    </section>
+  } @else {
+    <div class="join-room">
+      <div class="input-btn">
+        <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
+        <button (click)="onJoinRoom()">Join Room</button>
       </div>
-    }
+      <div style="height: 19px">
+        @if (username.touched && username.invalid) {
+          <span>username is required</span>
+        }
+      </div>
+    </div>
   }
 </main>
