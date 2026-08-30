@@ -1,59 +1,162 @@
 # Pokercrum
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+A modern, real-time poker gaming platform built with Angular and Firebase. Play poker in virtual rooms with real-time synchronization and interactive gameplay features.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **Real-time Multiplayer Rooms**: Create and join poker rooms with real-time player synchronization
+- **Interactive Card Display**: Visual representation of cards and player hands
+- **Player Management**: Track player information, chips, and game status
+- **Game Timer**: Built-in countdown timer for betting rounds and game phases
+- **Responsive Design**: Mobile-friendly UI built with Angular Material
+- **Room Settings**: Customizable room configurations for game rules and constraints
+- **Player Overlay**: Interactive overlay for additional player information and controls
 
-```bash
-ng serve
+## Tech Stack
+
+- **Frontend Framework**: [Angular 22.1.4](https://angular.dev/)
+- **Backend/Database**: [Firebase](https://firebase.google.com/) with [@angular/fire](https://github.com/angular/angularfire)
+- **UI Components**: [Angular Material 22.1.4](https://material.angular.io/)
+- **Language**: TypeScript 6.0.3
+- **Package Manager**: pnpm
+- **Testing**: Karma with TypeScript support
+- **Build Tool**: Angular Build
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── core/                # Core services and models
+│   │   ├── models/          # Data models (Card, Player, Room, Result)
+│   │   └── services/        # Singleton services (PlayerStore, RoomService)
+│   ├── pages/               # Page components
+│   │   ├── home/            # Home page
+│   │   └── room/            # Poker room page
+│   └── shared/              # Shared components
+│       └── components/      # Reusable UI components
+│           ├── card/        # Card display component
+│           ├── countdown/   # Countdown timer component
+│           ├── header/      # Page header
+│           ├── player/      # Player display component
+│           ├── room-settings/ # Room configuration component
+│           ├── timer-field/ # Timer input component
+│           └── user-info/   # User information component
+├── environments/            # Environment configuration
+└── styles.css               # Global styles
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Getting Started
 
-## Code scaffolding
+### Prerequisites
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Node.js (v18 or higher)
+- pnpm (v8 or higher)
 
-```bash
-ng generate component component-name
-```
+### Installation
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+1. Clone the repository:
 
 ```bash
-ng build
+git clone <repository-url>
+cd pokercrum
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+2. Install dependencies:
 
 ```bash
-ng test
+pnpm install
 ```
 
-## Running end-to-end tests
+3. Configure the environment (see [Configuration](#configuration) section)
 
-For end-to-end (e2e) testing, run:
+### Development
+
+Start the development server:
 
 ```bash
-ng e2e
+pnpm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Navigate to `http://localhost:4200/`. The application will automatically reload when you modify source files.
 
-## Additional Resources
+### Build
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Compile the project for production:
+
+```bash
+pnpm build
+```
+
+Build artifacts will be stored in the `dist/` directory.
+
+### Testing
+
+Run unit tests:
+
+```bash
+pnpm test
+```
+
+Tests are run using Karma and can be watched for development.
+
+## Project Scripts
+
+| Command          | Description                       |
+| ---------------- | --------------------------------- |
+| `pnpm start`     | Start development server          |
+| `pnpm build`     | Build for production              |
+| `pnpm watch`     | Watch mode for development builds |
+| `pnpm test`      | Run unit tests                    |
+| `pnpm build:env` | Generate environment variables    |
+
+## Architecture
+
+### Core Models
+
+- **Card**: Represents a playing card (suit and rank)
+- **Player**: Player information including name, status, and chip count
+- **Room**: Poker room configuration and state
+- **Result**: Game result tracking
+
+### Services
+
+- **PlayerStore**: Centralized player state management
+- **RoomService**: Room creation, joining, and game logic
+- **OverlayContent**: Manages overlay UI state
+- **DetectDevice**: Device detection for responsive UI
+
+## Configuration
+
+### Environment Variables
+
+To configure the environment, you need to:
+
+1. Create a `.env` file in the project root with your environment variables see the `.env.template`:
+
+```bash
+# Example .env file
+FIREBASE_API_KEY=your_api_key
+FIREBASE_PROJECT_ID=your_project_id
+# ... other variables
+```
+
+2. Run the environment build script to generate the TypeScript environment files:
+
+```bash
+pnpm build:env
+```
+
+This command processes the `.env` file and generates the appropriate configuration in:
+
+- `src/environments/environment.ts` - Development configuration
+
+**Note**: You must run `pnpm build:env` after updating `.env` for changes to take effect.
+
+## Code Style
+
+The project uses Prettier for code formatting with the following configuration:
+
+- Print Width: 100 characters
+- Single Quotes: enabled
+- Angular parser for HTML templates
