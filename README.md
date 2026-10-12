@@ -153,6 +153,16 @@ This command processes the `.env` file and generates the appropriate configurati
 
 **Note**: You must run `pnpm build:env` after updating `.env` for changes to take effect.
 
+### Firebase security rules
+
+The project includes a starter Firestore rule set at [`firestore.rules`](./firestore.rules). This is a baseline for protecting room ownership and player updates in production. To deploy it:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+The current Angular app still relies on local room state and a custom player model, so the rules are meant to be paired with Firebase Auth or an equivalent server-side identity layer before being used in production.
+
 ## Code Style
 
 The project uses Prettier for code formatting with the following configuration:

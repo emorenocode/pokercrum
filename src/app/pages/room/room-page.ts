@@ -5,7 +5,6 @@ import {
   inject,
   input,
   OnDestroy,
-  signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { RoomService } from './room-service';
@@ -24,6 +23,7 @@ import { PlayerStore } from '@/app/core/services/player-store';
 import { UICard } from '@/app/shared/components/card/card';
 import { UIPlayer } from '@/app/shared/components/player/player';
 import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { RoomState } from './room-state';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -77,7 +77,7 @@ export class RoomPage implements OnDestroy {
   private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
   private readonly roomService = inject(RoomService);
-  private readonly isInitialLoad = signal(true);
+  private readonly roomState = inject(RoomState);
   private readonly router = inject(Router);
   private readonly playerStore = inject(PlayerStore);
 
@@ -100,10 +100,10 @@ export class RoomPage implements OnDestroy {
       .sort((a, b) => a.vote - b.vote);
   });
 
-  public readonly isLoadingRoom = signal(true);
-  public readonly showCards = signal(true);
-  public readonly players = signal<Player[]>([]);
-  public readonly cardSelected = signal<Card | undefined | null>(undefined);
+  public readonly isLoadingRoom = this.roomState.isLoadingRoom;
+  public readonly showCards = this.roomState.showCards;
+  public readonly players = this.roomState.players;
+  public readonly cardSelected = this.roomState.cardSelected;
   public readonly player = this.playerStore.player;
   public readonly roomCode = input.required<string>();
   public readonly username = new FormControl<string>('', {
@@ -111,7 +111,7 @@ export class RoomPage implements OnDestroy {
     validators: [Validators.required],
   });
   public readonly currentRoom = this.roomService.currentRoom;
-  public readonly timerEnd = signal(0);
+  public readonly timerEnd = this.roomState.timerEnd;
   public readonly totalPlayers = computed(() => {
     return !this.isLoadingRoom() && this.players().length > 0
       ? ' (' + this.players().length + ')'
@@ -142,10 +142,7 @@ export class RoomPage implements OnDestroy {
 
   private resetRoomState() {
     this.onDestroy$.next();
-    this.cardSelected.set(undefined);
-    this.showCards.set(true);
-    this.isInitialLoad.set(true);
-    this.isLoadingRoom.set(true);
+    this.roomState.reset();
   }
 
   private onListenerRoom() {
@@ -164,12 +161,12 @@ export class RoomPage implements OnDestroy {
         }),
         switchMap((room) => {
           const roomData = room as Room;
-          if (!this.isInitialLoad()) return of(roomData);
+          if (!this.roomState.isInitialLoad()) return of(roomData);
           if (this.player().username.trim() === '') return of(roomData);
 
           const currentPlayer = this.getCurrentPlayer();
           if (currentPlayer) {
-            this.cardSelected.set(currentPlayer.card);
+            this.roomState.cardSelected.set(currentPlayer.card);
             this.playerStore.player.update((player) => ({
               ...player,
               ...currentPlayer,
@@ -184,10 +181,10 @@ export class RoomPage implements OnDestroy {
       )
       .subscribe({
         next: (room) => {
-          this.timerEnd.set(room.timerEnd);
-          this.showCards.set(room.show);
-          this.isInitialLoad.set(false);
-          this.isLoadingRoom.set(false);
+          this.roomState.timerEnd.set(room.timerEnd);
+          this.roomState.showCards.set(room.show);
+          this.roomState.isInitialLoad.set(false);
+          this.roomState.isLoadingRoom.set(false);
           this.onAutoRevealCardsChange(this.players());
         },
         error: () => {
@@ -212,11 +209,8 @@ export class RoomPage implements OnDestroy {
           const players = qs as unknown as Player[];
           if (players.length === 0) return;
 
-          this.players.set(players);
-          const currentPlayer = this.getCurrentPlayer();
-          if (currentPlayer) {
-            this.cardSelected.set(currentPlayer.card);
-          }
+          this.roomState.setPlayers(players);
+          this.roomState.syncCurrentPlayer(players, this.player().id);
           const roomOwner =
             this.player().room === this.roomCode()
               ? this.player()
@@ -235,14 +229,7 @@ export class RoomPage implements OnDestroy {
   }
 
   onAutoRevealCardsChange(players: Player[]) {
-    const room = this.currentRoom();
-    const allPlayersHaveCards = players.every((player) => player.card);
-    const isAutoRevealEnabled = room?.autoRevealCards ?? false;
-
-    if (!room || !isAutoRevealEnabled || (isAutoRevealEnabled && !allPlayersHaveCards)) return;
-
-    this.showCards.set(true);
-    this.timerEnd.set(0);
+    this.roomState.autoRevealIfNeeded(this.currentRoom(), players);
   }
 
   onJoinRoom() {
@@ -268,7 +255,7 @@ export class RoomPage implements OnDestroy {
   onSelectCard(card: Card) {
     if (this.showCards()) return;
 
-    this.cardSelected.set(card);
+    this.roomState.cardSelected.set(card);
     const user = { ...this.player(), card } as Player;
     this.roomService.selectCard(this.roomCode(), user).subscribe({
       error: () => {

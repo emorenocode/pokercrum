@@ -87,16 +87,25 @@
       }
     </section>
   } @else {
-    <div class="join-room">
-      <div class="input-btn">
-        <input type="text" name="username" placeholder="Enter Username" [formControl]="username" />
-        <button (click)="onJoinRoom()">Join Room</button>
+    @if (isLoadingRoom()) {
+      <p class="loading">Please wait, loading room...</p>
+    } @else {
+      <div class="join-room">
+        <div class="input-btn">
+          <input
+            type="text"
+            name="username"
+            placeholder="Enter Username"
+            [formControl]="username"
+          />
+          <button (click)="onJoinRoom()">Join Room</button>
+        </div>
+        <div style="height: 19px">
+          @if (username.touched && username.invalid) {
+            <span>username is required</span>
+          }
+        </div>
       </div>
-      <div style="height: 19px">
-        @if (username.touched && username.invalid) {
-          <span>username is required</span>
-        }
-      </div>
-    </div>
+    }
   }
 </main>

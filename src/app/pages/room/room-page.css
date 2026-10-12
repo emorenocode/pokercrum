@@ -4,6 +4,11 @@ main {
   max-width: 900px;
 }
 
+.loading {
+  margin-top: 3rem;
+  text-align: center;
+}
+
 .user-list {
   display: flex;
   justify-content: center;
