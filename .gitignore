@@ -51,3 +51,8 @@ Thumbs.db
 src/environments/environment.ts
 .env*
 !.env.template
+
+# AI
+.agents/*
+!.agents/skills/
+!.agents/skills/**
