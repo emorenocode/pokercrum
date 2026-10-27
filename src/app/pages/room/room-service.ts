@@ -79,6 +79,17 @@ export class RoomService {
   }
 
   joinRoom(player: Player, roomCode: string) {
+    //FIX temporal
+    const deleteRoomId =
+      this.currentRoom()?.id === roomCode &&
+      this.currentRoom()?.createdBy !== player.id &&
+      this.currentRoom()?.id === player.room;
+
+    if (deleteRoomId) {
+      delete player.room;
+      console.log('delete room id', player);
+    }
+
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
       tap(() => {
         this.playerStore.savePlayer(player);
