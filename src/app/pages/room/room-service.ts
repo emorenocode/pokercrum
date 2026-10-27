@@ -87,7 +87,6 @@ export class RoomService {
 
     if (deleteRoomId) {
       delete player.room;
-      console.log('delete room id', player);
     }
 
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
