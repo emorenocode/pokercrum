@@ -19,7 +19,7 @@ A modern, real-time poker gaming platform built with Angular and Firebase. Play 
 - **UI Components**: [Angular Material 22.1.4](https://material.angular.io/)
 - **Language**: TypeScript 6.0.3
 - **Package Manager**: pnpm
-- **Testing**: Vitest through Angular's unit-test builder
+- **Testing**: Karma with TypeScript support
 - **Build Tool**: Angular Build
 
 ## Project Structure
@@ -98,13 +98,7 @@ Run unit tests:
 pnpm test
 ```
 
-Run the full suite once without watch mode (for CI or local verification):
-
-```bash
-pnpm test:ci
-```
-
-The room service tests mock Firestore and cover room creation, joining, card selection, reveal/reset permissions, and player removal without requiring a Firebase project.
+Tests are run using Karma and can be watched for development.
 
 ## Project Scripts
 
@@ -114,7 +108,6 @@ The room service tests mock Firestore and cover room creation, joining, card sel
 | `pnpm build`     | Build for production              |
 | `pnpm watch`     | Watch mode for development builds |
 | `pnpm test`      | Run unit tests                    |
-| `pnpm test:ci`   | Run unit tests once without watch |
 | `pnpm build:env` | Generate environment variables    |
 
 ## Architecture
