@@ -6,16 +6,13 @@ import { ComponentPortal, TemplatePortal } from '@angular/cdk/portal';
 export class OverlayContent {
   private overlayRef?: OverlayRef;
 
-  constructor(
-    private overlay: Overlay,
-    private injector: Injector,
-  ) {}
+  constructor(private overlay: Overlay, private injector: Injector) {}
 
   open<T = any>(
     origin: HTMLElement,
     componentOrTemplate: ComponentType<T> | TemplateRef<T>,
     data?: any,
-    viewContainerRef?: ViewContainerRef,
+    viewContainerRef?: ViewContainerRef
   ) {
     this.close();
 

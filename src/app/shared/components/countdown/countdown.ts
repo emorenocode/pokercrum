@@ -6,7 +6,7 @@ import {
   output,
   signal,
   SimpleChanges,
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 

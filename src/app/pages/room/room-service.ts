@@ -101,9 +101,7 @@ export class RoomService {
           room: roomCode,
         };
 
-        return from(
-          setDoc(doc(this.firestore, 'rooms', roomCode, 'players', playerToSave.id), playerToSave),
-        ).pipe(
+        return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', playerToSave.id), playerToSave)).pipe(
           tap(() => {
             this.playerStore.savePlayer(playerToSave);
           }),
@@ -120,9 +118,7 @@ export class RoomService {
     }
 
     const playerWithRoom: Player = { ...player, room: roomCode };
-    return from(
-      setDoc(doc(this.firestore, 'rooms', roomCode, 'players', playerWithRoom.id), playerWithRoom),
-    );
+    return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', playerWithRoom.id), playerWithRoom));
   }
 
   onReveal(roomCode: string, show: boolean) {

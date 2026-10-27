@@ -1,9 +1,4 @@
-import {
-  isRoomOwner,
-  isValidUsername,
-  normalizeUsername,
-  canDeletePlayer,
-} from './room-validation';
+import { isRoomOwner, isValidUsername, normalizeUsername, canDeletePlayer } from './room-validation';
 
 describe('Room validation', () => {
   it('normalizes usernames', () => {
