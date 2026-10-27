@@ -104,9 +104,7 @@ describe('RoomService', () => {
     firestoreMocks.getDoc.mockResolvedValueOnce({ exists: () => false });
 
     await expect(
-      firstValueFrom(
-        service.joinRoom({ ...initialPlayer, username: 'Guest' }, 'missing-room'),
-      ),
+      firstValueFrom(service.joinRoom({ ...initialPlayer, username: 'Guest' }, 'missing-room')),
     ).rejects.toThrow('Room not found');
 
     expect(firestoreMocks.setDoc).not.toHaveBeenCalled();

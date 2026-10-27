@@ -50,8 +50,8 @@ src/
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- pnpm (v8 or higher)
+- Node.js 22
+- pnpm 11.7.0 (the version pinned in `package.json`)
 
 ### Installation
 
@@ -106,6 +106,14 @@ pnpm test:ci
 
 The room service tests mock Firestore and cover room creation, joining, card selection, reveal/reset permissions, and player removal without requiring a Firebase project.
 
+Check source formatting:
+
+```bash
+pnpm lint
+```
+
+GitHub Actions runs formatting checks, unit tests, and a production build for pushes and pull requests. The CI build uses empty Firebase configuration values because the build does not connect to Firebase.
+
 ## Project Scripts
 
 | Command          | Description                       |
@@ -115,6 +123,7 @@ The room service tests mock Firestore and cover room creation, joining, card sel
 | `pnpm watch`     | Watch mode for development builds |
 | `pnpm test`      | Run unit tests                    |
 | `pnpm test:ci`   | Run unit tests once without watch |
+| `pnpm lint`      | Check source formatting           |
 | `pnpm build:env` | Generate environment variables    |
 
 ## Architecture
