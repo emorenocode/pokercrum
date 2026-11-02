@@ -7,10 +7,12 @@ import {
   OnDestroy,
   signal,
   ChangeDetectionStrategy,
+  OnInit,
 } from '@angular/core';
 import { RoomService } from './room-service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Header } from '@/app/shared/components/header/header';
@@ -24,6 +26,9 @@ import { PlayerStore } from '@/app/core/services/player-store';
 import { UICard } from '@/app/shared/components/card/card';
 import { UIPlayer } from '@/app/shared/components/player/player';
 import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
+import { Logger } from '@/app/core/services/logger';
+import { AuthService } from '@/app/core/services/auth-service';
+import { PlayerPresence } from '@/app/core/services/player-presence';
 
 export function countCards(list: Player[]): Record<string, number> {
   return list.reduce(
@@ -67,12 +72,13 @@ const CARDS: Card[] = [
     UICard,
     UIPlayer,
     NgxSkeletonLoaderComponent,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './room-page.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './room-page.css',
 })
-export class RoomPage implements OnDestroy {
+export class RoomPage implements OnDestroy, OnInit {
   private readonly metaTitle = inject(Title);
   private readonly onDestroy$ = new Subject<void>();
   private readonly snackbar = inject(MatSnackBar);
@@ -80,11 +86,15 @@ export class RoomPage implements OnDestroy {
   private readonly isInitialLoad = signal(true);
   private readonly router = inject(Router);
   private readonly playerStore = inject(PlayerStore);
+  private readonly logger = inject(Logger);
+  private readonly authService = inject(AuthService);
+  private readonly playerPresence = inject(PlayerPresence);
+  readonly status$ = this.playerPresence.status$;
 
   protected readonly cards: Card[] = CARDS;
   protected readonly isOwner = computed(() => {
     const room = this.roomService.currentRoom();
-    return room?.createdBy === this.player().id;
+    return room?.createdBy === this.player().id || room?.createdBy === this.player().oldId;
   });
   protected readonly resultList = computed<Result[]>(() => {
     if (!this.showCards()) return [];
@@ -120,6 +130,7 @@ export class RoomPage implements OnDestroy {
   public readonly showDeleteAllPlayerButton = computed(() => {
     return !this.isLoadingRoom() && this.players().length > 0 && this.isOwner();
   });
+  public readonly onlineUsers = signal<string[]>([]);
 
   constructor() {
     effect(() => {
@@ -130,9 +141,76 @@ export class RoomPage implements OnDestroy {
     });
   }
 
+  ngOnInit(): void {
+    this.startPlayerPresence();
+  }
+
   ngOnDestroy(): void {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+    this.stopPlayerPresence();
+  }
+
+  startPlayerPresence() {
+    this.logger.debug('player.presence.starting', {
+      roomCode: this.roomCode(),
+      player: this.player(),
+    });
+    this.playerPresence
+      .start(this.roomCode())
+      .then(() => {
+        this.logger.debug('player.presence.started', {
+          roomCode: this.roomCode(),
+          player: this.player(),
+        });
+        this.playerPresence
+          .watchOnlineUsers(this.roomCode())
+          .pipe(takeUntil(this.onDestroy$))
+          .subscribe({
+            next: (onlineUsers) => {
+              this.onlineUsers.set(onlineUsers);
+              this.updatePlayerPresence(onlineUsers);
+            },
+            error: (error) => {
+              this.logger.error('player.presence.watchOnlineUsers.error', error, {
+                roomCode: this.roomCode(),
+                player: this.player(),
+              });
+            },
+          });
+      })
+      .catch((error) => {
+        this.logger.error('player.presence.start.error', error, {
+          roomCode: this.roomCode(),
+          player: this.player(),
+        });
+      });
+  }
+
+  private updatePlayerPresence(onlineUsers: string[]) {
+    this.players.update((players) => {
+      return players.map((player) => ({
+        ...player,
+        isOnline: onlineUsers.includes(player.id),
+      }));
+    });
+  }
+
+  stopPlayerPresence() {
+    this.playerPresence
+      .stop()
+      .then(() => {
+        this.logger.debug('player.presence.stopped', {
+          roomCode: this.roomCode(),
+          player: this.player(),
+        });
+      })
+      .catch((error) => {
+        this.logger.error('player.presence.stop.error', error, {
+          roomCode: this.roomCode(),
+          player: this.player(),
+        });
+      });
   }
 
   private startRoom() {
@@ -154,7 +232,12 @@ export class RoomPage implements OnDestroy {
       .pipe(
         retry(3),
         switchMap((room) => {
+          this.logger.debug('room.listener', { roomCode: this.roomCode(), room });
           if (!room && this.player().room === this.roomCode()) {
+            this.logger.debug('room.not-found', {
+              roomCode: this.roomCode(),
+              player: this.player(),
+            });
             return this.roomService.createRoom(this.player().username);
           } else if (!room) {
             return throwError(() => new Error('Room not found'));
@@ -176,9 +259,7 @@ export class RoomPage implements OnDestroy {
             }));
           }
 
-          return this.roomService
-            .joinRoom(this.player(), this.roomCode())
-            .pipe(map(() => roomData));
+          return this.roomService.joinRoom(this.roomCode()).pipe(map(() => roomData));
         }),
         takeUntil(this.onDestroy$),
       )
@@ -227,6 +308,7 @@ export class RoomPage implements OnDestroy {
 
           this.metaTitle.setTitle(`PokerCrum Room of ${roomOwner?.username}`);
           this.onAutoRevealCardsChange(players);
+          this.updatePlayerPresence(this.onlineUsers());
         },
         error: () => {
           this.snackbar.open('Error to get players', undefined, { duration: 3000 });
@@ -245,7 +327,7 @@ export class RoomPage implements OnDestroy {
     this.timerEnd.set(0);
   }
 
-  onJoinRoom() {
+  async onJoinRoom() {
     const username = this.username.value;
     if (this.username.invalid || username.trim() === '') {
       this.username.reset();
@@ -253,11 +335,23 @@ export class RoomPage implements OnDestroy {
       return;
     }
 
-    const user = { ...this.player(), username } as Player;
+    const userAuthenticated = await this.authService.signInAnonymously();
 
-    this.roomService.joinRoom(user, this.roomCode()).subscribe({
-      next: () => {
-        this.player.set(user);
+    this.logger.info('auth.user', {
+      userId: userAuthenticated.uid,
+      player: this.playerStore.player(),
+    });
+
+    this.playerStore.player.update((player) => ({
+      ...player,
+      username: username.trim(),
+      id: userAuthenticated.uid,
+    }));
+
+    this.roomService.joinRoom(this.roomCode()).subscribe({
+      next: (res) => {
+        // this.player.set(player);
+        this.logger.debug('room.joined', { roomCode: this.roomCode(), player: this.player(), res });
       },
       error: () => {
         this.snackbar.open('Error to join room', undefined, { duration: 3000 });

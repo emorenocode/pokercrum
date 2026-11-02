@@ -1,10 +1,11 @@
+import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { Player } from '@/app/core/models/player.model';
 import { PlayerStore } from '@/app/core/services/player-store';
-import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'ui-player',
-  imports: [],
+  imports: [MatTooltipModule],
   templateUrl: './player.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './player.css',

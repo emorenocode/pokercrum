@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 
 import { Player } from '@/app/core/models';
+import { PlayerStore } from '@/app/core/services/player-store';
 import { UIPlayer } from './player';
 
 describe('UIPlayer', () => {
@@ -10,6 +12,14 @@ describe('UIPlayer', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [UIPlayer],
+      providers: [
+        {
+          provide: PlayerStore,
+          useValue: {
+            player: signal({ id: '', username: '', fromMobile: false, isOnline: true }),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UIPlayer);
@@ -18,6 +28,7 @@ describe('UIPlayer', () => {
       id: 'player-id',
       username: 'Player',
       fromMobile: false,
+      isOnline: true,
     } satisfies Player);
     await fixture.whenStable();
   });

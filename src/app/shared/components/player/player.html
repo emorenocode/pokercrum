@@ -7,6 +7,11 @@
     @if (showDelete()) {
       <button title="Delete Player" (click)="onDelete.emit(player().id)">×</button>
     }
+    <span
+      class="user-presence"
+      [class.online]="player().isOnline"
+      [matTooltip]="player().isOnline ? '😃👍' : '😴'"
+    ></span>
   </div>
   <span>{{ player().username }}</span>
 </div>

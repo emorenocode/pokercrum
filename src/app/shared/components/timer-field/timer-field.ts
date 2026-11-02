@@ -1,4 +1,5 @@
 import { Room } from '@/app/core/models';
+import { Logger } from '@/app/core/services/logger';
 import { RoomService } from '@/app/pages/room/room-service';
 import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +13,7 @@ import { debounceTime } from 'rxjs';
   styleUrl: './timer-field.css',
 })
 export class TimerField implements OnInit {
+  private readonly logger = inject(Logger);
   private readonly roomService = inject(RoomService);
   currentRoom = this.roomService.currentRoom();
   formValue = new FormControl<number>(0, { nonNullable: true });
@@ -32,7 +34,7 @@ export class TimerField implements OnInit {
       timer: this.formValue.value,
     };
     this.roomService.updateRoom(updatedRoom).subscribe(() => {
-      console.log('Room updated successfully');
+      this.logger.debug('timer-field.save.success', { room: updatedRoom });
     });
   }
 }

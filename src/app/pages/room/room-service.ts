@@ -16,11 +16,13 @@ import {
   writeBatch,
 } from '@angular/fire/firestore';
 import { PlayerStore } from '@/app/core/services/player-store';
+import { Logger } from '@/app/core/services/logger';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoomService {
+  private readonly logger = inject(Logger);
   private readonly playerStore = inject(PlayerStore);
   private readonly firestore = inject(Firestore);
   public readonly currentRoom = signal<Room | undefined>(undefined);
@@ -41,7 +43,6 @@ export class RoomService {
       };
     });
     const currentPlayer = this.playerStore.player();
-
     const batch = writeBatch(this.firestore);
     const room: Room = {
       id: currentPlayer.room as string,
@@ -53,6 +54,7 @@ export class RoomService {
       createdAt: new Date(),
       updatedAt: new Date(),
       autoRevealCards: false,
+      owner: currentPlayer,
     };
     const roomRef = doc(this.firestore, 'rooms', currentPlayer.room as string);
     batch.set(roomRef, room);
@@ -78,11 +80,14 @@ export class RoomService {
     return collectionData(collection(this.firestore, 'rooms', roomCode, 'players'));
   }
 
-  joinRoom(player: Player, roomCode: string) {
+  joinRoom(roomCode: string) {
+    const player = this.playerStore.player();
+
     //FIX temporal
     const deleteRoomId =
       this.currentRoom()?.id === roomCode &&
       this.currentRoom()?.createdBy !== player.id &&
+      this.currentRoom()?.createdBy !== player.oldId &&
       this.currentRoom()?.id === player.room;
 
     if (deleteRoomId) {
@@ -91,6 +96,7 @@ export class RoomService {
 
     return from(setDoc(doc(this.firestore, 'rooms', roomCode, 'players', player.id), player)).pipe(
       tap(() => {
+        this.logger.debug('player.joined-room', { roomCode, player });
         this.playerStore.savePlayer(player);
       }),
       map(() => player),
@@ -138,6 +144,7 @@ export class RoomService {
   onListenerRoom(roomCode: string) {
     return docData(doc(this.firestore, 'rooms', roomCode)).pipe(
       tap((room) => {
+        this.logger.debug('room.listener', { roomCode, room });
         this.currentRoom.set(room as Room);
       }),
     );

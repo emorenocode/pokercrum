@@ -4,6 +4,13 @@ main {
   max-width: 900px;
 }
 
+.loading-room {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90dvh;
+}
+
 .user-list {
   display: flex;
   justify-content: center;

@@ -31,6 +31,7 @@ export const environment = {
     authDomain: '${process.env['FIREBASE_AUTH_DOMAIN']}',
     messagingSenderId: '${process.env['FIREBASE_MESSAGING_SENDER_ID']}',
     measurementId: '${process.env['FIREBASE_MEASUREMENT_ID']}',
+    databaseURL: '${process.env['FIREBASE_DATABASE_URL']}',
   },
   reCaptchaV3SiteKey: '${process.env['RECAPTCHA_KEY']}',
   environment: '${process.env['ENVIRONMENT']}'

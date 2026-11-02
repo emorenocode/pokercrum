@@ -1,4 +1,11 @@
-import { Component, computed, inject, TemplateRef, ViewContainerRef, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  TemplateRef,
+  ViewContainerRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -7,6 +14,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { OverlayContent } from '@/app/core/services/overlay-content';
 import { UserInfo } from '../user-info/user-info';
 import { PlayerStore } from '@/app/core/services/player-store';
+import { Logger } from '@/app/core/services/logger';
 
 @Component({
   selector: 'app-header',
@@ -16,6 +24,7 @@ import { PlayerStore } from '@/app/core/services/player-store';
   styleUrl: './header.css',
 })
 export class Header {
+  private readonly logger = inject(Logger);
   private readonly playerStore = inject(PlayerStore);
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly overlayContent = inject(OverlayContent);
@@ -53,7 +62,7 @@ export class Header {
         this.overlayContent.close();
       }
     } catch (error) {
-      console.error('Error to copy link ', error);
+      this.logger.error('header.copy-link.error', error);
       this.snackbar.open('Error copying link', undefined, { duration: 3000 });
     }
   }

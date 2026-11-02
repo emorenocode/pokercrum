@@ -10,4 +10,5 @@ export interface Room {
   createdAt: Date;
   updatedAt: Date;
   autoRevealCards: boolean;
+  owner: Player;
 }
