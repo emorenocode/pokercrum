@@ -1,12 +1,12 @@
 import { Component, inject, model, ChangeDetectionStrategy } from '@angular/core';
-import { TimerField } from '../timer-field/timer-field';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { RoomService } from '@/app/pages/room/room-service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
+import { RoomService } from '@/app/pages/room/room-service';
+import { TimerField } from '../timer-field/timer-field';
 
 @Component({
   selector: 'app-room-settings',
-  imports: [TimerField, MatCheckboxModule, FormsModule],
+  imports: [TimerField, FormsModule, MatSlideToggleModule],
   templateUrl: './room-settings.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './room-settings.css',

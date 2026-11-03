@@ -1,7 +1,12 @@
-<div>
+<div class="room-settings">
   <h6>Room Settings</h6>
   <app-timer-field />
-  <mat-checkbox [(ngModel)]="autoRevealCards" (ngModelChange)="updateAutoRevealCards()">
+  <mat-slide-toggle
+    fullWidth
+    labelPosition="before"
+    [(ngModel)]="autoRevealCards"
+    (ngModelChange)="updateAutoRevealCards()"
+  >
     Auto reveal cards
-  </mat-checkbox>
+  </mat-slide-toggle>
 </div>

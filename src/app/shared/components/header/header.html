@@ -28,9 +28,19 @@
 
 <ng-template #dialogToShared let-link>
   <div class="dialog-to-shared">
-    <div class="link">
-      {{ link }}
-    </div>
-    <button matButton (click)="copyLink()">Copy Link</button>
+    <button
+      #qrCode
+      type="button"
+      class="qr-code-copy"
+      aria-label="Copy QR code to clipboard"
+      title="Copy QR code to clipboard"
+      (click)="copyQrCode(qrCode)"
+    >
+      <qr-code value="{{ link }}" size="150" errorCorrectionLevel="M" margin="4" />
+    </button>
+    <button matButton (click)="copyLink()">
+      Copy Link
+      <mat-icon aria-hidden="false" aria-label="Link" fontIcon="link"></mat-icon>
+    </button>
   </div>
 </ng-template>
