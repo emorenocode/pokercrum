@@ -4,6 +4,18 @@
   min-height: 100dvh;
 }
 
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100dvh;
+  font-size: 1.25rem;
+
+  span {
+    color: #737373;
+  }
+}
+
 header {
   margin-block: 5rem;
 }
